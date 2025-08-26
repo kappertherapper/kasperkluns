@@ -9,29 +9,34 @@ import SwiftUI
 
 struct AddView: View {
     
-    @State var product: Product
+    @State private var name: String = ""
+    @State private var description: String = ""
+    
+    //var onSave: (Product) -> Void
+    
     @State private var showConfirmation = false
     
     var body: some View {
         Form {
             Section(header: Text("Product Details")) {
                 HStack {
-                    Text("Name:")
+                    Text("Name: ")
                         .bold()
-                    TextField("Name", text: $product.name)
+                    TextField("", text: $name)
                 }
                 .padding(.top, 20)
                 HStack {
-                    Text("Description:")
+                    Text("Description: ")
                         .bold()
-                    TextField("Description", text: $product.description)
+                    TextEditor(text: $description)
                 }
                 .padding(.top, 20)
             }
             .navigationTitle("Edit product")
         }
         Button(action: {
-            // edit action
+            _ = Product(name: name, description: description)
+            showConfirmation.toggle()
         }) {
             Text("Add")
                 .foregroundColor(.white)
@@ -39,13 +44,10 @@ struct AddView: View {
                 .background(Color.purple)
                 .cornerRadius(10)
                 .bold()
-                .padding(20)
         }
         .alert("Got it all right?", isPresented: $showConfirmation) {
-            Button("Yes", role: .destructive) {
-                product.sold = true
-            }
             Button("Cancel", role: .cancel) {}
+            Button("Yes", role: .destructive) {}
         } message: {
             Text("Are you sure")
         }
@@ -54,5 +56,5 @@ struct AddView: View {
 
 #Preview {
     @Previewable @State var product = Product(name: "NB990", description: "cool")
-    AddView(product: product)
+    AddView()
 }

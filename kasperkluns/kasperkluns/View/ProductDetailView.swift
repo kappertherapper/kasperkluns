@@ -9,9 +9,11 @@ import SwiftUI
 
 struct ProductDetailView: View {
     
+    // MARK: - parameters
     @State var product: Product
     @State private var showConfirmation = false
     @State private var showingSheet = false
+
     
     var body: some View {
         VStack(spacing: 20) {
@@ -26,7 +28,7 @@ struct ProductDetailView: View {
             Button(action: {
                 showConfirmation = true
             }) {
-                Text("Sold?")
+                Text("Sold")
                     .foregroundColor(.white)
                     .padding()
                     .background(Color.purple)
@@ -34,13 +36,13 @@ struct ProductDetailView: View {
                     .bold()
                     .padding(20)
             }
-            .alert("Got it boss?", isPresented: $showConfirmation) {
+            .alert("Is this product sold boss?", isPresented: $showConfirmation) {
                 Button("Yes", role: .destructive) {
                     product.sold = true
                 }
                 Button("Cancel", role: .cancel) {}
             } message: {
-                Text("Are you sure")
+                Text("Are you sure?")
             }
             
             Spacer()
@@ -48,7 +50,7 @@ struct ProductDetailView: View {
             Button(action: {
                 showingSheet = true
             }) {
-                Text("Changing")
+                Text("Edit")
                     .foregroundColor(.white)
                     .padding()
                     .background(Color.purple)
