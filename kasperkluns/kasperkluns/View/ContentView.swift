@@ -16,7 +16,7 @@ struct ContentView: View {
     
     @State private var productService = ProductService()
     
-    @State private var selectedItem: ProductReponse? = nil
+    @State var selectedItem: ProductReponse
     @State private var showingDetailSheet = false
     @State private var showingAddSheet = false
     
@@ -40,6 +40,13 @@ struct ContentView: View {
             } else {
                 List(productService.products) { product in
                     Text(product.name)
+                    
+                    Button(action: {
+                        selectedItem = product
+                        showingDetailSheet = true
+                    }) {
+                        
+                    }
                 }
                 .refreshable {
                     Task {
@@ -47,19 +54,25 @@ struct ContentView: View {
                     }
                 }
             }
-            //Button(action: {
-            //  selectedItem = product
-            //showingDetailSheet = true
-            //}) {
-            
-            //  .navigationTitle("Products")
-            //.sheet(isPresented: $showingDetailSheet) {
-            //  ProductDetailView(product: product)
+        }
+        .navigationTitle("Products")
+        .sheet(isPresented: $showingDetailSheet) {
+            ProductDetailView(product: selectedItem )
         }
     }
 }
-
-
-#Preview {
-    ContentView()
-}
+    
+    #Preview {
+        let dummyProduct = ProductReponse(
+            id: UUID(),
+            sku: 123456,
+            name: "Test Product",
+            description: "This is a test description for the product.",
+            brand: Brand(rawValue: "Test Brand"),
+            sold: false,
+            createdAt: Date(),
+            updatedAt: Date(),
+            deletedAt: nil
+        )
+        ContentView(selectedItem: dummyProduct)
+    }
