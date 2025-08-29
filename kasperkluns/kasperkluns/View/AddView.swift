@@ -35,7 +35,7 @@ struct AddView: View {
             .navigationTitle("Edit product")
         }
         Button(action: {
-            _ = Product(name: name, description: description)
+            //_ = Product(name: name, description: description)
             showConfirmation.toggle()
         }) {
             Text("Add")
@@ -55,6 +55,6 @@ struct AddView: View {
 }
 
 #Preview {
-    @Previewable @State var product = Product(name: "NB990", description: "cool")
+    //@Previewable @State var product = Product(name: "NB990", sku: "55")
     AddView()
 }

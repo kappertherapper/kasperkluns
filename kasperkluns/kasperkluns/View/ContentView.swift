@@ -9,59 +9,56 @@ import SwiftUI
 
 struct ContentView: View {
     
-    var products = [
-        Product(name: "New Balance 990 v3", description: "fucking seje"),
-        Product(name: "New Balance 2002R", description: "slidte øv bøv", sold: true),
-        Product(name: "New Balance 993", description: "dejlige")
-    ]
+    //var products = [
+    //Product(name: "New Balance 990 v3", description: "fucking seje"),
+    //Product(name: "New Balance 2002R", description: "slidte øv bøv", sold: true),
+    //Product(name: "New Balance 993", description: "dejlige")
     
-    @State private var selectedItem: Product? = nil
+    @State private var productService = ProductService()
+    
+    @State private var selectedItem: ProductReponse? = nil
     @State private var showingDetailSheet = false
     @State private var showingAddSheet = false
     
     var body: some View {
         NavigationView {
-            List(products) { product in
-                Button(action: {
-                    selectedItem = product
-                    showingDetailSheet = true
-                }) {
-                    HStack {
-                        //Text(product.id.uuidString)
-                        /*@START_MENU_TOKEN@*/Text(product.name)/*@END_MENU_TOKEN@*/
-                        
-                        Spacer()
-                        
-                        Circle()
-                            .fill(product.sold ? Color.green : Color.red)
-                            .frame(width: 20, height: 15)
-                            .shadow(radius: 5)
+            if productService.isLoading {
+                ProgressView("Henter produkter..")
+                    .padding()
+            } else if productService.products.isEmpty {
+                VStack {
+                    Text("No products found")
+                        .foregroundColor(.secondary)
+                    
+                    Button("Refresh") {
+                        Task {
+                            try await productService.fetchProducts()
+                        }
                     }
-                    .navigationTitle("Products")
-                    .sheet(isPresented: $showingDetailSheet) {
-                        ProductDetailView(product: product)
+                    .buttonStyle(.bordered)
+                }
+            } else {
+                List(productService.products) { product in
+                    Text(product.name)
+                }
+                .refreshable {
+                    Task {
+                        try await productService.fetchProducts()
                     }
                 }
             }
-        }
-        HStack {
-            Button(action: {
-                showingAddSheet = true
-            }) {
-                Text("Add")
-                    .foregroundColor(.white)
-                    .padding()
-                    .background(Color.purple)
-                    .cornerRadius(10)
-                    .bold()
-                    .padding(20)
-            }
-            .sheet(isPresented: $showingAddSheet) {
-                AddView()
-            }
+            //Button(action: {
+            //  selectedItem = product
+            //showingDetailSheet = true
+            //}) {
+            
+            //  .navigationTitle("Products")
+            //.sheet(isPresented: $showingDetailSheet) {
+            //  ProductDetailView(product: product)
         }
     }
 }
+
 
 #Preview {
     ContentView()

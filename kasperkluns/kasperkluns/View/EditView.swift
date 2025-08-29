@@ -9,7 +9,7 @@ import SwiftUI
 
 struct EditView: View {
     
-    @Binding var product: Product
+    @Binding var product: ProductReponse
     
     var body: some View {
         Form {
@@ -17,13 +17,13 @@ struct EditView: View {
                 HStack {
                     Text("Name:")
                         .bold()
-                    TextField("Name", text: $product.name)
+                    //TextField("Name", text: $product.name)
                 }
                 .padding(.top, 20)
                 HStack {
                     Text("Description:")
                         .bold()
-                    TextField("Description", text: $product.description)
+                    //TextField("Description", text: $product.description)
                 }
                 .padding(.top, 20)
             }
@@ -44,6 +44,6 @@ struct EditView: View {
 }
 
 #Preview {
-    @Previewable @State var product = Product(name: "NB990", description: "cool")
-    EditView(product: $product)
+    //@Previewable @State var product = Product(name: "NB990", description: "cool")
+    //EditView(product: $product)
 }

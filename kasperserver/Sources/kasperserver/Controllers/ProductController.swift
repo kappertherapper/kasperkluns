@@ -38,7 +38,7 @@ struct ProductController: RouteCollection {
         }
         
         guard let sku = requestContent.sku else {
-            throw Abort(.badRequest, reason: "Name is required")
+            throw Abort(.badRequest, reason: "SKU is required")
         }
         
         let product = Product(requestContent: requestContent, name: name, sku: sku)

@@ -16,6 +16,8 @@ public func configure(_ app: Application) async throws {
         database: Environment.get("DATABASE_NAME") ?? "vapor_database",
         tls: .disable
     )
+
+    print("DATABASE_URL:", Environment.get("DATABASE_URL") ?? "ikke fundet")
     
     app.databases.use(
            .postgres(

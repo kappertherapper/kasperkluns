@@ -10,14 +10,14 @@ import SwiftUI
 struct ProductDetailView: View {
     
     // MARK: - parameters
-    @State var product: Product
+    @State var product: ProductReponse
     @State private var showConfirmation = false
     @State private var showingSheet = false
 
     
     var body: some View {
         VStack(spacing: 20) {
-            Text(product.description)
+            Text(product.description ?? "muuh")
                 .font(.largeTitle)
                 .padding(.top)
         }
@@ -38,7 +38,7 @@ struct ProductDetailView: View {
             }
             .alert("Is this product sold boss?", isPresented: $showConfirmation) {
                 Button("Yes", role: .destructive) {
-                    product.sold = true
+                    //product.sold = true //ret sold
                 }
                 Button("Cancel", role: .cancel) {}
             } message: {
@@ -66,5 +66,5 @@ struct ProductDetailView: View {
 }
 
 #Preview {
-    ProductDetailView(product: Product(name: "NB 990", description: "cool"))
+    //ProductDetailView(product: Product(name: "NB 990", description: "cool"))
 }
