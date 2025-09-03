@@ -5,7 +5,6 @@
 //  Created by Kasper Jonassen on 25/08/2025.
 //
 
-import SwiftUI
 import Foundation
 
 struct ProductReponse: Codable, Identifiable {

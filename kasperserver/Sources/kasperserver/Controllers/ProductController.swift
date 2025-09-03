@@ -33,16 +33,21 @@ struct ProductController: RouteCollection {
     @Sendable
     private func createProduct(request: Request) async throws -> ProductResponseContent {
         let requestContent = try request.content.decode(ProductRequestContent.self)
-        guard let name = requestContent.name else {
-            throw Abort(.badRequest, reason: "Name is required")
-        }
         
-        guard let sku = requestContent.sku else {
-            throw Abort(.badRequest, reason: "SKU is required")
+        let name = requestContent.name
+        
+        let sku = requestContent.sku
+        if sku <= 0 { //
+            throw Abort(.badRequest, reason: "SKU is required and must be valid")
         }
         
         let product = Product(requestContent: requestContent, name: name, sku: sku)
-        try await product.save(on: request.db)
+        
+        // Log the values being inserted
+        //print("Inserting brand value: '\(product.brand?.rawValue ?? "nil")'")
+        //print("Brand enum case: \(String(describing: product.brand))")
+        
+        try await product.saveWithEnumCast(on: request.db)
         
         return try ProductResponseContent(product: product)
     }

@@ -26,9 +26,11 @@ class ProductService {
                 throw URLError(.badServerResponse)
             }
             
+            /* Test
             if let jsonString = String(data: data, encoding: .utf8) {
-                print("📦 Raw JSON:", jsonString)
+                print("JSON:", jsonString)
             }
+             */
             
             let decoder = JSONDecoder()
             decoder.dateDecodingStrategy = .iso8601
@@ -66,7 +68,7 @@ class ProductService {
     
 //MARK: - ADD
     func addProduct(name: String, Sku: Int, description: String?, brand:
-                    Brand?, sold: Bool?) async throws {
+                    String?, sold: Bool?) async throws {
         isLoading = true
         errorMessage = nil
         defer { isLoading = false }
@@ -107,7 +109,7 @@ class ProductService {
         request.httpMethod = "DELETE"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
-        let (data, response) = try await URLSession.shared.data(for: request)
+        let (_, response) = try await URLSession.shared.data(for: request)
         
         guard let httpResponse = response as? HTTPURLResponse,
               httpResponse.statusCode == 201 else {

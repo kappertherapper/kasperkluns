@@ -12,8 +12,9 @@ struct CreateProductMigration: AsyncMigration {
         
         try await database.schema(Product.schema)
             .id()
-            .field("name", .string)
-            .field("sku", .int)
+            .field("name", .string, .required)
+            .field("sku", .int, .required)
+            .unique(on: "sku")
             .field("description", .string)
             .field("brand", brand)
             .field("sold", .bool, .required, .sql(.default(false)))

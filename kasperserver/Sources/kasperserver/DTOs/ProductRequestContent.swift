@@ -1,8 +1,8 @@
 import Vapor
 
 struct ProductRequestContent: Content {
-    var name: String?
-    let sku: Int?
+    var name: String
+    let sku: Int
     let description: String?
     let brand: String?
     let sold: Bool?
@@ -26,6 +26,8 @@ extension Product {
     
     private static func getBrand(_ brand: String?) -> Brand? {
         guard let brand else { return nil }
+        
+        //print("Converting brand string: '\(brand)'") //Test
         return Brand(rawValue: brand)
     }
 }
