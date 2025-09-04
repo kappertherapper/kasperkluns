@@ -77,12 +77,15 @@ class ProductService {
             throw URLError(.badURL)
         }
         
-        let newProduct = ProductRequest(name: name, sku: Sku, description: description, brand: brand, sold: sold)
+        let newProduct = ProductRequest(name: name, sku: Sku, description: description, brand: brand, sold: sold, createdAt: Date.now)
         
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.httpBody = try JSONEncoder().encode(newProduct)
+
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        request.httpBody = try encoder.encode(newProduct)
         
         let (data, response) = try await URLSession.shared.data(for: request)
         
@@ -118,9 +121,14 @@ class ProductService {
         }
         DispatchQueue.main.async {
             if let index = self.products.firstIndex(where: { $0.id == id }) {
+                self.products[index].sku = updatedProduct.sku
                 self.products[index].name = updatedProduct.name
                 self.products[index].description = updatedProduct.description
                 self.products[index].brand = updatedProduct.brand
+                self.products[index].sold = updatedProduct.sold
+                self.products[index].createdAt = updatedProduct.createdAt
+                self.products[index].updatedAt = updatedProduct.updatedAt
+                self.products[index].deletedAt = updatedProduct.deletedAt
             }
         }
     }

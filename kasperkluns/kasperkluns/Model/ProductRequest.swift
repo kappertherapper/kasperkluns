@@ -6,5 +6,6 @@ struct ProductRequest: Codable {
     let description: String?
     let brand: String?
     let sold: Bool?
+    let createdAt: Date?
 }
 

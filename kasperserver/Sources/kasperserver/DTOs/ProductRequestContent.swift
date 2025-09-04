@@ -6,6 +6,7 @@ struct ProductRequestContent: Content {
     let description: String?
     let brand: String?
     let sold: Bool?
+    let createdAt: Date?
 }
 
 // MARK: - Helper
@@ -22,6 +23,7 @@ extension Product {
         self.description = requestContent.description
         self.brand = Self.getBrand(requestContent.brand)
         self.sold = requestContent.sold ?? false
+        self.createdAt = requestContent.createdAt ?? Date.now
     }
     
     private static func getBrand(_ brand: String?) -> Brand? {

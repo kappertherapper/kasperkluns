@@ -13,10 +13,10 @@ struct ProductReponse: Codable, Identifiable {
     var name: String
     var description: String? = ""
     var brand: Brand?
-    let sold: Bool?
-    let createdAt: Date?
-    let updatedAt: Date?
-    let deletedAt: Date?
+    var sold: Bool?
+    var createdAt: Date?
+    var updatedAt: Date?
+    var deletedAt: Date?
 }
 
 extension ProductReponse {
