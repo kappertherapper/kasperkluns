@@ -7,10 +7,9 @@
 
 import SwiftUI
 
-//@MainActor
 struct AddView: View {
     
-    @State private var productService = ProductService()
+    @Environment(ProductService.self) private var productService
     
     @State private var name: String = ""
     @State private var sku: Int = 0
@@ -25,8 +24,7 @@ struct AddView: View {
             Color.clear.edgesIgnoringSafeArea(.all)
             
             Form {
-                Section(header: Text("Product Details")) {
-                    
+                Section(header: Text("Add a new Product")) {
                     HStack {
                         Text("Name: ")
                             .bold()
@@ -52,10 +50,9 @@ struct AddView: View {
                         }
                         .buttonStyle(.plain)
                         .padding(.horizontal, 20 )
-                        TextField("EnSKU", value: $sku, format: .number)
+                        TextField("SKU", value: $sku, format: .number)
                             .padding(.leading, 50)
                             .font(.largeTitle)
-                            
                             .disabled(true)
                     }
                     .padding(.top, 20)
@@ -83,25 +80,18 @@ struct AddView: View {
                     }
                     .padding(.top, 20)
                     
+                    /*
                     HStack {
                         Toggle("Sold?", isOn: $sold)
                             .bold()
                         //Text("Selected: \(sold ? "True" : "False")")
                     }
                     .padding(.top, 20)
+                     */
                 }
                 HStack {
                     Spacer()
                     Button(action: {
-                        Task {
-                            try await productService.addProduct(
-                                name: name,
-                                Sku: sku,
-                                description: description,
-                                brand: brand.rawValue,
-                                sold: sold)
-                        }
-                        
                         showConfirmation.toggle()
                     }) {
                         Text("Add")
@@ -111,16 +101,21 @@ struct AddView: View {
                             .cornerRadius(10)
                             .bold()
                     }
-                    
-                    /*
                     .alert("Got it all right?", isPresented: $showConfirmation) {
                         Button("Cancel", role: .cancel) {}
-                        Button("Yes", role: .destructive) {}
+                        Button("Yes", role: .destructive) {
+                            Task {
+                                try await productService.addProduct(
+                                    name: name,
+                                    Sku: sku,
+                                    description: description,
+                                    brand: brand.rawValue,
+                                    sold: sold)
+                            }
+                        }
                     } message: {
                         Text("Are you sure")
                     }
-                     
-                     */
                 }
             }
         }
@@ -144,4 +139,5 @@ struct AddView: View {
 #Preview {
     //@Previewable @State var product = Product(name: "NB990", sku: "55")
     AddView()
+        .environment(ProductService())
 }

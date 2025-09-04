@@ -88,4 +88,31 @@ extension Product {
             }
         }
     }
+    
+    func updateWithEnumCast(on database: any Database) async throws {
+            guard let sqlDB = database as? (any SQLDatabase) else {
+                throw Abort(.internalServerError, reason: "Database is not SQL")
+            }
+            
+            guard let id = self.id else {
+                throw Abort(.badRequest, reason: "Cannot update a Product without an ID")
+            }
+            
+            let result = try await sqlDB.raw("""
+                UPDATE products
+                SET sku = \(bind: self.sku),
+                    name = \(bind: self.name),
+                    description = \(bind: self.description),
+                    brand = \(bind: self._brand ?? Brand.NewBalance.rawValue)::brand,
+                    sold = \(self.sold),
+                    "updatedAt" = \(bind: self.updatedAt)
+                WHERE id = \(bind: id)
+                RETURNING id, "updatedAt"
+            """).first()
+            
+            if let row = result {
+                self.id = try row.decode(column: "id", as: UUID.self)
+                self.updatedAt = try row.decode(column: "updatedAt", as: Date.self)
+            }
+        }
 }

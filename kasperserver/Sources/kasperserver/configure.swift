@@ -29,7 +29,7 @@ public func configure(_ app: Application) async throws {
     
     app.migrations.add(CreateProductMigration())
     
-    try await app.autoRevert()
+    //try await app.autoRevert()
     try await app.autoMigrate()
     try routes(app)
 

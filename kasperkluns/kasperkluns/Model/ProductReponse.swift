@@ -9,12 +9,23 @@ import Foundation
 
 struct ProductReponse: Codable, Identifiable {
     let id: UUID
-    let sku: Int
+    var sku: Int
     var name: String
-    let description: String?
-    let brand: Brand?
+    var description: String? = ""
+    var brand: Brand?
     let sold: Bool?
     let createdAt: Date?
     let updatedAt: Date?
     let deletedAt: Date?
+}
+
+extension ProductReponse {
+    func toUpdateContent() -> ProductUpdate {
+        return ProductUpdate(
+            sku: self.sku,
+            name: self.name,
+            description: self.description ?? "",
+            brand: self.brand ?? Brand.NewBalance
+        )
+    }
 }

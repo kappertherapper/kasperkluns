@@ -10,11 +10,10 @@ import SwiftUI
 struct ProductDetailView: View {
     
     // MARK: - parameters
-    @State var product: ProductReponse
+    var product: ProductReponse
     @State private var showConfirmation = false
     @State private var showingSheet = false
 
-    
     var body: some View {
         VStack(spacing: 20) {
             Text(product.description ?? "muuh")
@@ -59,12 +58,25 @@ struct ProductDetailView: View {
                     .padding(20)
             }
             .sheet(isPresented: $showingSheet) {
-                EditView(product: $product)
+                EditView(product: product)
             }
         }
     }
 }
 
 #Preview {
-    //ProductDetailView(product: Product(name: "NB 990", description: "cool"))
+    
+    @Previewable @State var dummyProduct = ProductReponse(
+        id: UUID(),
+        sku: 123456,
+        name: "Test Product",
+        description: "This is a test description for the product.",
+        brand: Brand(rawValue: "Test Brand"),
+        sold: false,
+        createdAt: Date(),
+        updatedAt: Date(),
+        deletedAt: nil
+    )
+    
+    ProductDetailView(product: dummyProduct)
 }

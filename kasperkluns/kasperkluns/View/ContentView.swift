@@ -9,26 +9,12 @@ import SwiftUI
 
 struct ContentView: View {
     
-    let dummyProduct = ProductReponse(
-        id: UUID(),
-        sku: 123456,
-        name: "Test Product",
-        description: "This is a test description for the product.",
-        brand: Brand(rawValue: "Test Brand"),
-        sold: false,
-        createdAt: Date(),
-        updatedAt: Date(),
-        deletedAt: nil
-    )
-    
-    @State private var productService = ProductService()
-    
+    @Environment(ProductService.self) private var productService
     @State private var selectedItem: ProductReponse? = nil
-    @State private var selectedValue: Int? = nil
-    @State private var showingDetailSheet = false
-    @State private var showingAddSheet = false
-    
+    @State private var gotoDetailView = false
+    @State private var showAddView = false
     @State private var sortOption: String = "All"
+ 
     
     var filteredProducts: [ProductReponse] {
         switch sortOption {
@@ -40,7 +26,7 @@ struct ContentView: View {
     }
     
     var body: some View {
-        NavigationStack {
+        NavigationView {
             VStack {
                 if productService.isLoading {
                     ProgressView("Henter produkter..")
@@ -59,20 +45,38 @@ struct ContentView: View {
                     }
                 } else {
                     List(filteredProducts) { product in
-                        HStack {
-                            Text(product.name)
-                                .onTapGesture {
-                                    selectedItem = product
-                                    showingDetailSheet = true
+                        NavigationLink(destination: ProductDetailView(product: product)) {
+                            HStack(spacing: 10) {
+                                Text(product.sku.formatted())
+                                    .font(.subheadline)
+                                    .foregroundColor(.gray)
+                                Text(product.name)
+                                    .font(.headline)
+                                    .foregroundColor(.primary)
+                                    .onTapGesture {
                                 }
-                            if product.sold ?? false  {
+                                .padding(.vertical, 5)
                                 Spacer()
+                            }
+                            if product.sold ?? false  {
                                 Text("Sold")
                                     .font(.caption)
                                     .foregroundColor(.green)
                                     .bold()
+                                    .padding(.horizontal, 20)
                             }
                         }
+                    }
+                    
+                    Button(action: {
+                        showAddView = true
+                    }) {
+                        Text("Add product")
+                            .foregroundColor(.white)
+                            .padding()
+                            .background(Color.purple)
+                            .cornerRadius(10)
+                            .bold()
                     }
                     .navigationTitle("Products")
                     .toolbar {
@@ -84,12 +88,14 @@ struct ContentView: View {
                                 Label("Vælg", systemImage: "chevron.down")
                             }
                         }
-                        ToolbarItem(placement: .navigationBarTrailing) {
-                            Button(action: {
+                    }
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button {
                                 Task {
                                     try await productService.fetchProducts()
                                 }
-                            }) {
+                            } label: {
                                 Image(systemName: "arrow.clockwise")
                             }
                         }
@@ -102,12 +108,13 @@ struct ContentView: View {
                 }
             }
         }
-        .sheet(isPresented: $showingDetailSheet) {
-            ProductDetailView(product: selectedItem ?? dummyProduct )
+        .sheet(isPresented: $showAddView) {
+            AddView()
         }
     }
 }
     
     #Preview {
         ContentView()
+            .environment(ProductService())
     }

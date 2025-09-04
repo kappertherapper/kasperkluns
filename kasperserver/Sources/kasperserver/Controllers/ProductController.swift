@@ -85,7 +85,7 @@ struct ProductController: RouteCollection {
         product.setvalue(requestContent.name, to: \.name)
         product.setvalue(requestContent.description, to: \.description)
         product.setBrand(requestContent.brand)
-        try await product.update(on: request.db)
+        try await product.updateWithEnumCast(on: request.db)
         
         return try ProductResponseContent(product: product)
     }
