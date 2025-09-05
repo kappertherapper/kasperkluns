@@ -1,10 +1,3 @@
-//
-//  EditView.swift
-//  kasperkluns
-//
-//  Created by Kasper Jonassen on 25/08/2025.
-//
-
 import SwiftUI
 
 struct EditView: View {

@@ -11,8 +11,8 @@ class ProductService {
     
 // MARK: - READ
     func fetchProducts() async throws {
-        isLoading = true
-        defer { isLoading = false }
+        await MainActor.run { isLoading = true }
+        defer { Task { await MainActor.run { isLoading = false } } }
         
         do {
             guard let url = URL(string: "\(baseURL)/products") else {
@@ -128,8 +128,36 @@ class ProductService {
                 self.products[index].sold = updatedProduct.sold
                 self.products[index].createdAt = updatedProduct.createdAt
                 self.products[index].updatedAt = updatedProduct.updatedAt
-                self.products[index].deletedAt = updatedProduct.deletedAt
             }
+        }
+    }
+    
+    func updateProductSold(id: UUID, newSold: Bool) async throws {
+        guard let url = URL(string: "\(baseURL)/products/\(id)") else {
+            throw URLError(.badURL)
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "PATCH"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try JSONEncoder().encode(ProductSold(sold: newSold))
+        
+        let (_, response) = try await URLSession.shared.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse,
+              httpResponse.statusCode == 200 else {
+            throw URLError(.badServerResponse)
+        }
+        
+        guard let index = products.firstIndex(where: { $0.id == id }) else {
+            throw NSError(domain: "Product not found", code: 0)
+        }
+        
+        var updatedProduct = products[index]
+        updatedProduct.sold = newSold
+        
+        await MainActor.run {
+            products[index] = updatedProduct
         }
     }
     
@@ -145,12 +173,11 @@ class ProductService {
         
         var request = URLRequest(url: url)
         request.httpMethod = "DELETE"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
         let (_, response) = try await URLSession.shared.data(for: request)
         
         guard let httpResponse = response as? HTTPURLResponse,
-              httpResponse.statusCode == 201 else {
+              (200...299).contains(httpResponse.statusCode) else {
             throw URLError(.badServerResponse)
         }
         

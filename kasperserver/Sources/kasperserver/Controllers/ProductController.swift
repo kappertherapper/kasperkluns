@@ -9,11 +9,12 @@ struct ProductController: RouteCollection {
             try await createProduct(request: request)
         }
         
-        // Read
+        // Read all
         products.get { request in
             try await getProducts(request: request)
         }
     
+        // Read one
         products.get(":id") { request in
             try await getProduct(request: request)
         }
@@ -21,6 +22,11 @@ struct ProductController: RouteCollection {
         // Update
         products.put(":id") { request in
             try await updateProduct(request: request)
+        }
+        
+        // Update sold
+        products.patch(":id") { request in
+            try await updateProductSold(request: request)
         }
         
         // Delete
@@ -86,6 +92,20 @@ struct ProductController: RouteCollection {
         product.setvalue(requestContent.description, to: \.description)
         product.setBrand(requestContent.brand)
         try await product.updateWithEnumCast(on: request.db)
+        
+        return try ProductResponseContent(product: product)
+    }
+    
+    @Sendable
+    private func updateProductSold(request: Request) async throws -> ProductResponseContent {
+        let id: UUID? = request.parameters.get("id")
+        
+        guard let product = try await  Product.find(id, on: request.db) else {
+            throw Abort(.notFound)
+        }
+        let Content = try request.content.decode(ProductSold.self)
+        product.setvalue(Content.sold, to: \.sold)
+        try await product.update(on: request.db)
         
         return try ProductResponseContent(product: product)
     }

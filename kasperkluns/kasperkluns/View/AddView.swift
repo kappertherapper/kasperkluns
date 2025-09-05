@@ -1,10 +1,3 @@
-//
-//  AddView.swift
-//  kasperkluns
-//
-//  Created by Kasper Jonassen on 25/08/2025.
-//
-
 import SwiftUI
 
 struct AddView: View {
@@ -20,75 +13,64 @@ struct AddView: View {
     @State private var showConfirmation = false
     
     var body: some View {
-        ZStack {
-            Color.clear.edgesIgnoringSafeArea(.all)
-            
-            Form {
-                Section(header: Text("Add a new Product")) {
-                    HStack {
-                        Text("Name: ")
-                            .bold()
-                        TextField("", text: $name)
-                    }
-                    .textFieldStyle(.roundedBorder)
-                    .padding(.top, 10)
-                    
-                    HStack {
-                        Text("Sku: ")
-                            .bold()
-                        Button(action: {
-                            Task {
-                                let count = await getProductCount()
-                                sku = count
-                            }
-                        }) {
-                            Image(systemName: "arrow.triangle.2.circlepath")
-                                .resizable()
-                                .bold()
-                                .frame(width: 24, height: 24)
-                                .foregroundStyle(.blue)
-                        }
-                        .buttonStyle(.plain)
-                        .padding(.horizontal, 20 )
-                        TextField("SKU", value: $sku, format: .number)
-                            .padding(.leading, 50)
-                            .font(.largeTitle)
-                            .disabled(true)
-                    }
-                    .padding(.top, 20)
-                    
-                    HStack(alignment: .top) {
-                        Text("Description: ")
-                            .bold()
-                        
-                        TextEditor(text: $description)
-                            .padding(4)
-                            .background(Color.gray.opacity(0.2))
-                            .cornerRadius(8)
-                            .frame(height: 100)
-                    }
-                    .padding(.top, 20)
-                    
-                    HStack {
-                        Picker("Brand", selection: $brand) {
-                            ForEach(Brand.allCases) { brand in
-                                Text(brand.rawValue).tag(brand)
-                            }
-                        }
+        Form {
+            Section(header: Text("Add a new Product")) {
+                HStack {
+                    Text("Name: ")
                         .bold()
-                        .pickerStyle(.menu)
-                    }
-                    .padding(.top, 20)
-                    
-                    /*
-                    HStack {
-                        Toggle("Sold?", isOn: $sold)
-                            .bold()
-                        //Text("Selected: \(sold ? "True" : "False")")
-                    }
-                    .padding(.top, 20)
-                     */
+                    TextField("", text: $name)
                 }
+                .textFieldStyle(.roundedBorder)
+                .padding(.top, 10)
+                
+                HStack {
+                    Text("Sku: ")
+                        .bold()
+                    Button(action: {
+                        Task {
+                            let count = await getProductCount()
+                            sku = count
+                        }
+                    }) {
+                        Image(systemName: "arrow.triangle.2.circlepath")
+                            .resizable()
+                            .bold()
+                            .frame(width: 30, height: 24)
+                            .foregroundStyle(.blue)
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.horizontal, 20)
+                    
+                    TextField("SKU", value: $sku, format: .number)
+                        .padding(.leading, 50)
+                        .font(.largeTitle)
+                        .disabled(true)
+                }
+                .padding(.top, 20)
+                
+                HStack(alignment: .top) {
+                    Text("Description: ")
+                        .bold()
+                    
+                    TextEditor(text: $description)
+                        .padding(4)
+                        .background(Color.gray.opacity(0.2))
+                        .cornerRadius(8)
+                        .frame(height: 100)
+                }
+                .padding(.top, 20)
+                
+                HStack {
+                    Picker("Brand", selection: $brand) {
+                        ForEach(Brand.allCases) { brand in
+                            Text(brand.rawValue).tag(brand)
+                        }
+                    }
+                    .bold()
+                    .pickerStyle(.menu)
+                }
+                .padding(.top, 20)
+                
                 HStack {
                     Spacer()
                     Button(action: {

@@ -15,8 +15,6 @@ public func configure(_ app: Application) async throws {
         database: Environment.get("DATABASE_NAME") ?? "vapor_database",
         tls: .disable,
     )
-
-    print("DATABASE_URL:", Environment.get("DATABASE_URL") ?? "ikke fundet")
     
     app.databases.use(
            .postgres(
@@ -29,7 +27,7 @@ public func configure(_ app: Application) async throws {
     
     app.migrations.add(CreateProductMigration())
     
-    try await app.autoRevert()
+    //try await app.autoRevert()
     try await app.autoMigrate()
     try routes(app)
 
