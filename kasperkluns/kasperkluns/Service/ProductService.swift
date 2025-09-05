@@ -11,8 +11,8 @@ class ProductService {
     
 // MARK: - READ
     func fetchProducts() async throws {
-        await MainActor.run { isLoading = true }
-        defer { Task { await MainActor.run { isLoading = false } } }
+        isLoading = true
+        defer { isLoading = false }
         
         do {
             guard let url = URL(string: "\(baseURL)/products") else {
@@ -111,7 +111,10 @@ class ProductService {
         var request = URLRequest(url: url)
         request.httpMethod = "PUT"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.httpBody = try JSONEncoder().encode(updatedProduct)
+        
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        request.httpBody = try encoder.encode(updatedProduct)
         
         let (_, response) = try await URLSession.shared.data(for: request)
         
@@ -119,15 +122,12 @@ class ProductService {
               httpResponse.statusCode == 200 else {
             throw URLError(.badServerResponse)
         }
-        DispatchQueue.main.async {
+        await MainActor.run {
             if let index = self.products.firstIndex(where: { $0.id == id }) {
-                self.products[index].sku = updatedProduct.sku
-                self.products[index].name = updatedProduct.name
-                self.products[index].description = updatedProduct.description
-                self.products[index].brand = updatedProduct.brand
-                self.products[index].sold = updatedProduct.sold
-                self.products[index].createdAt = updatedProduct.createdAt
-                self.products[index].updatedAt = updatedProduct.updatedAt
+                var product = self.products[index]
+                product = updatedProduct
+                product.updatedAt = Date.now
+                self.products[index] = product
             }
         }
     }
@@ -183,6 +183,16 @@ class ProductService {
         
         if let product = products.firstIndex(where: { $0.id == id }) {
             products.remove(at: product)
+        }
+    }
+    
+    func getProductCount() async -> Int {
+        do {
+            try await fetchProducts()
+            return products.count+1
+        } catch {
+            print("Fejl: \(error)")
+            return 0
         }
     }
 }

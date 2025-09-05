@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct ProductDetailView: View {
+struct DetailView: View {
     
     // MARK: - parameters
     @Environment(ProductService.self) private var productService
@@ -117,6 +117,6 @@ struct ProductDetailView: View {
         deletedAt: nil
     )
     
-    ProductDetailView(product: dummyProduct)
+    DetailView(product: dummyProduct)
         .environment(ProductService())
 }

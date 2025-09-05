@@ -43,18 +43,20 @@ struct ContentView: View {
                     }
                 } else {
                     List(filteredProducts) { product in
-                        NavigationLink(destination: ProductDetailView(product: product)) {
+                        NavigationLink(destination: DetailView(product: product)) {
                             HStack(spacing: 10) {
                                 Text(product.sku.formatted())
                                     .font(.subheadline)
                                     .foregroundColor(.gray)
+                                
                                 Text(product.name)
                                     .font(.headline)
                                     .foregroundColor(.primary)
                                     .padding(.vertical, 5)
                                 
-                                    Spacer()
+                                Spacer()
                                 
+                                    //Delete swipe
                                     .swipeActions {
                                         Button(role: .destructive) {
                                             selectedItem = product
@@ -64,19 +66,17 @@ struct ContentView: View {
                                         }
                                     }
                                 
-                            if product.sold  {
-                                Text("Sold")
-                                    .font(.caption)
-                                    .foregroundColor(.green)
-                                    .bold()
-                                    .padding(.horizontal, 20)
+                                if product.sold  {
+                                    Text("Sold")
+                                        .font(.caption)
+                                        .foregroundColor(.green)
+                                        .bold()
+                                        .padding(.horizontal, 20)
+                                }
                             }
                         }
-                        
-                        }
-                        
                     }
-                    .alert("You sure u want to delete this product?",
+                    .alert("Sure you want to delete this product?",
                            isPresented: $showConfirmation,
                            presenting: selectedItem) { product in
                         Button("Cancel", role: .cancel) {}
@@ -93,6 +93,7 @@ struct ContentView: View {
                         Text("It will be gone forever!")
                     }
                     
+                    //Add btn
                     Button(action: {
                         showAddView = true
                     }) {
@@ -103,8 +104,8 @@ struct ContentView: View {
                             .cornerRadius(10)
                             .bold()
                     }
-                    
                     .navigationTitle("Products")
+                    
                     .toolbar {
                         ToolbarItem(placement: .topBarTrailing) {
                             Menu {
@@ -115,6 +116,7 @@ struct ContentView: View {
                             }
                         }
                     }
+                    
                     .toolbar {
                         ToolbarItem(placement: .topBarTrailing) {
                             Button {
@@ -126,11 +128,18 @@ struct ContentView: View {
                             }
                         }
                     }
-                    .refreshable {
-                        Task {
-                            try await productService.fetchProducts()
-                        }
-                    }
+                }
+            }
+            .task {
+                do {
+                   try await productService.fetchProducts()
+                } catch {
+                    print("error fetching products: \(error)")
+                }
+            }
+            .refreshable {
+                Task {
+                    try await productService.fetchProducts()
                 }
             }
         }

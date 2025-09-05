@@ -28,7 +28,7 @@ struct AddView: View {
                         .bold()
                     Button(action: {
                         Task {
-                            let count = await getProductCount()
+                            let count = await productService.getProductCount()
                             sku = count
                         }
                     }) {
@@ -102,16 +102,6 @@ struct AddView: View {
             }
         }
     }
-    
-    func getProductCount() async -> Int {
-        do {
-            try await productService.fetchProducts()
-            return productService.products.count+1
-        } catch {
-            print("Fejl: \(error)")
-            return 0
-        }
-    }
 }
 
 
@@ -119,7 +109,6 @@ struct AddView: View {
 
 
 #Preview {
-    //@Previewable @State var product = Product(name: "NB990", sku: "55")
     AddView()
         .environment(ProductService())
 }
