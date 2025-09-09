@@ -1,6 +1,6 @@
 # KasperKluns Inventory App
 
-![Product Image](images/kasperkluns logo.png)
+![Product Image](images/kasperkluns_logo.png)
 
 
 ## 🧾 Overview
