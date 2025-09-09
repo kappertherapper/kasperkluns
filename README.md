@@ -7,10 +7,9 @@ kasperkluns is my personal inventory management application designed for small b
 
 ## 🛠️ Features
 - Add, edit, and delete product listings
-- Track product quantities and sales
-- Categorize products by type, size, and condition
-- Search and filter products easily
-- Generate sales reports
+- Track product sales
+- Search and filter products
+- More to be added
 
 ## 🚀 Installation
 Clone the repository:
