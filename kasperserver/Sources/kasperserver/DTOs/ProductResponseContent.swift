@@ -6,10 +6,11 @@ struct ProductResponseContent: Content {
     let sku: Int
     let description: String?
     let brand: String?
+    let purchasePrice: Double
+    let purchaseDate: Date
+    let salePrice: Double?
+    let saleDate: Date?
     let sold: Bool?
-    let createdAt: Date?
-    let updatedAt: Date?
-    let deletedAt: Date?
 }
 
 // MARK: - Helper
@@ -21,9 +22,10 @@ extension ProductResponseContent {
         sku = product.sku
         description = product.description
         brand = product.brand?.rawValue
+        purchasePrice = product.purchasePrice
+        purchaseDate = product.purchaseDate
+        salePrice = product.salePrice
+        saleDate = product.saleDate
         sold = product.sold
-        createdAt = product.createdAt
-        updatedAt = product.updatedAt
-        deletedAt = product.deletedAt
     }
 }

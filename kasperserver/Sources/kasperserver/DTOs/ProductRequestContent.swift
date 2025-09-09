@@ -5,8 +5,11 @@ struct ProductRequestContent: Content {
     let sku: Int
     let description: String?
     let brand: String?
+    let purchasePrice: Double
+    let purchaseDate: Date
+    let salePrice: Double?
+    let saleDate: Date?
     let sold: Bool?
-    let createdAt: Date?
 }
 
 // MARK: - Helper
@@ -22,8 +25,11 @@ extension Product {
         self.sku = sku
         self.description = requestContent.description
         self.brand = Self.getBrand(requestContent.brand)
+        self.purchasePrice = requestContent.purchasePrice
+        self.purchaseDate = requestContent.purchaseDate
+        self.salePrice = requestContent.salePrice
+        self.saleDate = requestContent.saleDate
         self.sold = requestContent.sold ?? false
-        self.createdAt = requestContent.createdAt ?? Date.now
     }
     
     private static func getBrand(_ brand: String?) -> Brand? {

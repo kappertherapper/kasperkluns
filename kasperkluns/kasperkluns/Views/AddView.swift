@@ -9,6 +9,8 @@ struct AddView: View {
     @State private var description: String = ""
     @State private var brand: Brand = .NewBalance
     @State private var sold: Bool = false
+    @State private var purchasePrice: Double? = nil
+    @State private var purchaseDate: Date = Date()
     
     @State private var showConfirmation = false
     
@@ -72,37 +74,59 @@ struct AddView: View {
                 .padding(.top, 20)
                 
                 HStack {
+                    Text("Purchase Price:")
+                        .bold()
                     Spacer()
-                    Button(action: {
-                        showConfirmation.toggle()
-                    }) {
-                        Text("Add")
-                            .foregroundColor(.white)
-                            .padding()
-                            .background(Color.purple)
-                            .cornerRadius(10)
-                            .bold()
+                    TextField("Purchase Price", value: $purchasePrice, format: .currency(code: "DKK"))
+                        .keyboardType(.decimalPad)
+                        .multilineTextAlignment(.trailing)
+                        .padding(.horizontal, 10)
+                }
+                .padding(.top, 15)
+                .padding(.bottom, 15)
+                
+                DatePicker("Purchase Date:", selection: $purchaseDate, displayedComponents: .date)
+                    .bold()
+                    .padding(.top, 15)
+                    .padding(.bottom, 15)
+            }
+            
+            HStack {
+                Spacer()
+                Button(action: {
+                    showConfirmation.toggle()
+                }) {
+                    Text("Add")
+                        .foregroundColor(.white)
+                        .padding()
+                        .background(Color.purple)
+                        .cornerRadius(10)
+                        .bold()
+                }
+                .alert("Got it all right?", isPresented: $showConfirmation) {
+                    Button("Cancel", role: .cancel) {}
+                    Button("Yes", role: .destructive) {
+                        
+                         Task {
+                         try await productService.addProduct(
+                         name: name,
+                         Sku: sku,
+                         description: description,
+                         brand: brand.rawValue,
+                         purchasePrice: purchasePrice ?? 0.0,
+                         purchaseDate: purchaseDate,
+                         sold: sold)
+                         }
+                         
                     }
-                    .alert("Got it all right?", isPresented: $showConfirmation) {
-                        Button("Cancel", role: .cancel) {}
-                        Button("Yes", role: .destructive) {
-                            Task {
-                                try await productService.addProduct(
-                                    name: name,
-                                    Sku: sku,
-                                    description: description,
-                                    brand: brand.rawValue,
-                                    sold: sold)
-                            }
-                        }
-                    } message: {
-                        Text("Are you sure")
-                    }
+                } message: {
+                    Text("Are you sure")
                 }
             }
         }
     }
 }
+
 
 
 

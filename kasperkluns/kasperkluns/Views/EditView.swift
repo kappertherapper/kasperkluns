@@ -103,10 +103,11 @@ extension Binding where Value == String? {
         name: "Test Product",
         description: "This is a test description for the product.",
         brand: Brand(rawValue: "Test Brand"),
+        purchasePrice: 99.99,
+        purchaseDate: Date(),
+        salePrice: 100.00,
+        saleDate: Date(),
         sold: false,
-        createdAt: Date(),
-        updatedAt: Date(),
-        deletedAt: nil
     )
     EditView(product: dummyProduct)
         .environment(ProductService())

@@ -11,8 +11,8 @@ struct ContentView: View {
     
     @State private var sortOption: String = "All"
     
-   
- 
+    
+    
     
     var filteredProducts: [ProductReponse] {
         switch sortOption {
@@ -25,114 +25,107 @@ struct ContentView: View {
     
     var body: some View {
         NavigationView {
-            VStack {
-                if productService.isLoading {
-                    ProgressView("Henter produkter..")
-                        .padding()
-                } else if productService.products.isEmpty {
-                    VStack {
-                        Text("No products found")
-                            .foregroundColor(.secondary)
-                        
-                        Button("Refresh") {
-                            Task {
-                                try await productService.fetchProducts()
-                            }
-                        }
-                        .buttonStyle(.bordered)
-                    }
-                } else {
-                    List(filteredProducts) { product in
-                        NavigationLink(destination: DetailView(product: product)) {
-                            HStack(spacing: 10) {
-                                Text(product.sku.formatted())
-                                    .font(.subheadline)
-                                    .foregroundColor(.gray)
-                                
-                                Text(product.name)
-                                    .font(.headline)
-                                    .foregroundColor(.primary)
-                                    .padding(.vertical, 5)
-                                
-                                Spacer()
-                                
-                                    //Delete swipe
-                                    .swipeActions {
-                                        Button(role: .destructive) {
-                                            selectedItem = product
-                                            showConfirmation = true
-                                        } label: {
-                                            Label("Delete", systemImage: "trash")
-                                        }
-                                    }
-                                
-                                if product.sold  {
-                                    Text("Sold")
-                                        .font(.caption)
-                                        .foregroundColor(.green)
-                                        .bold()
-                                        .padding(.horizontal, 20)
-                                }
-                            }
-                        }
-                    }
-                    .alert("Sure you want to delete this product?",
-                           isPresented: $showConfirmation,
-                           presenting: selectedItem) { product in
-                        Button("Cancel", role: .cancel) {}
-                        Button("Yes", role: .destructive) {
-                            Task {
-                                do {
-                                    try await productService.deleteProduct(id: product.id)
-                                } catch {
-                                    print("Fejl ved sletning: \(error)")
-                                }
-                            }
-                        }
-                    } message: {_ in
-                        Text("It will be gone forever!")
-                    }
-                    
-                    //Add btn
-                    Button(action: {
-                        showAddView = true
-                    }) {
-                        Text("Add product")
-                            .foregroundColor(.white)
+            ZStack {
+                Color(.systemGray6)
+                    .ignoresSafeArea()
+                
+                VStack(spacing: 15) {
+                    if productService.isLoading {
+                        ProgressView("Henter produkter..")
                             .padding()
-                            .background(Color.purple)
-                            .cornerRadius(10)
-                            .bold()
-                    }
-                    .navigationTitle("Products")
-                    
-                    .toolbar {
-                        ToolbarItem(placement: .topBarTrailing) {
-                            Menu {
-                                Button("All") { sortOption = "All" }
-                                Button("Sold") { sortOption = "Sold" }
-                            } label: {
-                                Label("Vælg", systemImage: "chevron.down")
-                            }
-                        }
-                    }
-                    
-                    .toolbar {
-                        ToolbarItem(placement: .topBarTrailing) {
-                            Button {
+                    } else if productService.products.isEmpty {
+                        VStack(spacing: 10) {
+                            Text("No products found")
+                                .foregroundColor(.secondary)
+                            
+                            Button("Refresh") {
                                 Task {
                                     try await productService.fetchProducts()
                                 }
-                            } label: {
-                                Image(systemName: "arrow.clockwise")
                             }
+                            .buttonStyle(.bordered)
+                        }
+                        .padding()
+                    } else {
+                        // List
+                        List(filteredProducts) { product in
+                            NavigationLink(destination: DetailView(product: product)) {
+                                HStack(spacing: 10) {
+                                    Text(product.sku.formatted())
+                                        .font(.subheadline)
+                                        .foregroundColor(.gray)
+                                    
+                                    Text(product.name)
+                                        .font(.headline)
+                                        .foregroundColor(.primary)
+                                        .padding(.vertical, 5)
+                                    
+                                    Spacer()
+                                    
+                                    if product.sold  {
+                                        Text("Sold")
+                                            .font(.caption)
+                                            .foregroundColor(.green)
+                                            .bold()
+                                            .padding(.horizontal, 20)
+                                    }
+                                }
+                            }
+                            .swipeActions {
+                                Button(role: .destructive) {
+                                    selectedItem = product
+                                    showConfirmation = true
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
+                            }
+                            
+                        }
+                        .listStyle(.plain)
+                        
+                        // Add button
+                        Button(action: {
+                            showAddView = true
+                        }) {
+                            HStack {
+                                Image(systemName: "plus")
+                                Text("Add Product")
+                                    .bold()
+                            }
+                            .foregroundColor(.white)
+                            .padding(.vertical, 12)
+                            .frame(maxWidth: .infinity)
+                            .background(Color.purple)
+                            .cornerRadius(10)
+                            .shadow(radius: 2)
+                        }
+                        .padding(.horizontal)
+                        .padding(.top)
+                        
+                        .alert("Sure you want to delete this product?",
+                               isPresented: $showConfirmation,
+                               presenting: selectedItem) { product in
+                            Button("Cancel", role: .cancel) {}
+                            Button("Yes", role: .destructive) {
+                                Task {
+                                    do {
+                                        try await productService.deleteProduct(id: product.id)
+                                    } catch {
+                                        print("Fejl ved sletning: \(error)")
+                                    }
+                                }
+                            }
+                        } message: {_ in
+                            Text("It will be gone forever!")
                         }
                     }
+                    
+                    Spacer()
                 }
             }
             .task {
                 do {
-                   try await productService.fetchProducts()
+                    try await productService.fetchProducts()
                 } catch {
                     print("error fetching products: \(error)")
                 }
@@ -141,7 +134,19 @@ struct ContentView: View {
                 Task {
                     try await productService.fetchProducts()
                 }
+                
             }
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Menu {
+                        Button("All") { sortOption = "All" }
+                        Button("Sold") { sortOption = "Sold" }
+                    } label: {
+                        Label("Vælg", systemImage: "chevron.down")
+                    }
+                }
+            }
+            .navigationTitle("Products")
         }
         .sheet(isPresented: $showAddView) {
             AddView()

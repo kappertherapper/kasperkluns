@@ -44,8 +44,14 @@ struct ProductController: RouteCollection {
         
         let sku = requestContent.sku
         if sku <= 0 { //
-            throw Abort(.badRequest, reason: "SKU is required and must be valid")
+            throw Abort(.badRequest, reason: "SKU is required and cant be negative")
         }
+        
+        let purchasePrice = requestContent.purchasePrice
+        if purchasePrice <= 0 { //
+            throw Abort(.badRequest, reason: "Price is required and must be higher than zero")
+        }
+        _ = requestContent.purchaseDate
         
         let product = Product(requestContent: requestContent, name: name, sku: sku)
         
@@ -91,6 +97,11 @@ struct ProductController: RouteCollection {
         product.setvalue(requestContent.name, to: \.name)
         product.setvalue(requestContent.description, to: \.description)
         product.setBrand(requestContent.brand)
+        product.setvalue(requestContent.purchasePrice, to: \.purchasePrice)
+        product.setvalue(requestContent.purchaseDate, to: \.purchaseDate)
+        product.setvalue(requestContent.salePrice, to: \.salePrice)
+        product.setvalue(requestContent.saleDate, to: \.saleDate)
+        product.setvalue(requestContent.sold, to: \.sold)
         try await product.updateWithEnumCast(on: request.db)
         
         return try ProductResponseContent(product: product)
@@ -103,13 +114,19 @@ struct ProductController: RouteCollection {
         guard let product = try await  Product.find(id, on: request.db) else {
             throw Abort(.notFound)
         }
-        let Content = try request.content.decode(ProductSold.self)
+        
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .secondsSince1970
+        
+        let Content = try request.content.decode(ProductSold.self, using: decoder)
+        
         product.setvalue(Content.sold, to: \.sold)
+        product.setvalue(Content.salePrice, to: \.salePrice)
+        product.setvalue(Content.saleDate, to: \.saleDate)
         try await product.update(on: request.db)
         
         return try ProductResponseContent(product: product)
     }
-    
     
     //MARK: - DELETE
     

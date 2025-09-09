@@ -17,10 +17,14 @@ struct CreateProductMigration: AsyncMigration {
             .unique(on: "sku")
             .field("description", .string)
             .field("brand", brand)
+            .field("purchase_price", .double, .required)
+            .field("purchase_date", .date, .required)
+            .field("sale_price", .double)
+            .field("sale_date", .date)
             .field("sold", .bool, .required, .sql(.default(false)))
-            .field("createdAt", .datetime)
-            .field("updatedAt", .datetime)
-            .field("deletedAt", .datetime)
+            .field("created_at", .datetime)
+            .field("updated_at", .datetime)
+            .field("deleted_at", .datetime)
             .create()
     }
     

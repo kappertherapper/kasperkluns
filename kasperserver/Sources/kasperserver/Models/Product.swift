@@ -19,7 +19,7 @@ final class Product: Model, @unchecked Sendable {
     var description: String?
     
     @OptionalField(key: "brand")
-        private var _brand: String?
+    private var _brand: String?
         
     var brand: Brand? {
         get {
@@ -31,16 +31,28 @@ final class Product: Model, @unchecked Sendable {
         }
     }
     
+    @Field(key: "purchase_price")
+    var purchasePrice: Double
+    
+    @Field(key: "purchase_date")
+    var purchaseDate: Date
+    
+    @OptionalField(key: "sale_price")
+    var salePrice: Double?
+    
+    @OptionalField(key: "sale_date")
+    var saleDate: Date?
+    
     @Boolean(key: "sold")
     var sold: Bool
     
-    @Timestamp(key: "createdAt", on: .create)
+    @Timestamp(key: "created_at", on: .create)
     var createdAt: Date?
     
-    @Timestamp(key: "updatedAt", on: .update)
+    @Timestamp(key: "updated_at", on: .update)
     var updatedAt: Date?
     
-    @Timestamp(key: "deletedAt", on: .delete)
+    @Timestamp(key: "deleted_at", on: .delete)
     var deletedAt: Date?
     
     init() {}
@@ -76,15 +88,29 @@ extension Product {
         
         if self.id == nil {
             let result = try await sqlDB.raw("""
-                INSERT INTO products (id, sku, name, description, brand, sold, "createdAt", "updatedAt") 
-                VALUES (gen_random_uuid(), \(bind: self.sku), \(bind: self.name), \(bind: self.description), \(bind: self._brand ?? Brand.NewBalance.rawValue)::brand, \(self.sold), \(bind: self.createdAt), \(bind: self.updatedAt))
-                RETURNING id, "createdAt", "updatedAt"
+                INSERT INTO products (id, sku, name, description, brand, purchase_price, purchase_date, sale_price, sale_date, sold, created_at, updated_at
+                ) 
+                VALUES (
+                gen_random_uuid(),
+                \(bind: self.sku),
+                \(bind: self.name),
+                \(bind: self.description),
+                \(bind: self._brand ?? Brand.NewBalance.rawValue)::brand,
+                \(bind: self.purchasePrice),
+                \(bind: self.purchaseDate),
+                \(bind: self.salePrice),
+                \(bind: self.saleDate),
+                \(self.sold),
+                \(bind: self.createdAt ?? Date()),
+                \(bind: self.updatedAt ?? Date())
+                )
+                RETURNING id, "created_at", "updated_at"
                 """).first()
             
             if let row = result {
                 self.id = try row.decode(column: "id", as: UUID.self)
-                //self.createdAt = try row.decode(column: "createdAt", as: Date.self)
-                //self.updatedAt = try row.decode(column: "updatedAt", as: Date.self)
+                self.createdAt = try row.decode(column: "created_at", as: Date.self)
+                self.updatedAt = try row.decode(column: "updated_at", as: Date.self)
             }
         }
     }
@@ -104,6 +130,10 @@ extension Product {
                     name = \(bind: self.name),
                     description = \(bind: self.description),
                     brand = \(bind: self._brand ?? Brand.NewBalance.rawValue)::brand,
+                    purchasePrice = \(bind: self.purchasePrice),
+                    purchaseDate = \(bind: self.purchaseDate),
+                    salePrice = \(bind: self.salePrice),
+                    saleDate = \(bind: self.saleDate),
                     sold = \(self.sold),
                     "updatedAt" =  NOW()
                 WHERE id = \(bind: id)
@@ -112,7 +142,7 @@ extension Product {
         
         if let row = result {
             self.id = try row.decode(column: "id", as: UUID.self)
-            self.updatedAt = (try? row.decode(column: "updatedAt", as: Date.self)) ?? Date.now
+            self.updatedAt = (try? row.decode(column: "updated_at", as: Date.self)) ?? Date.now
         } else {
             throw Abort(.internalServerError, reason: "Failed to update product or retrieve updatedAt")
         }

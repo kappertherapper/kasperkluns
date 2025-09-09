@@ -8,6 +8,7 @@ class ProductService {
     var errorMessage: String?
     
     private let baseURL = "http://localhost:8080"
+    //private let baseURL = "http://10.44.0.129:8080"
     
 // MARK: - READ
     func fetchProducts() async throws {
@@ -68,7 +69,7 @@ class ProductService {
     
 //MARK: - ADD
     func addProduct(name: String, Sku: Int, description: String?, brand:
-                    String?, sold: Bool?) async throws {
+                    String?, purchasePrice: Double, purchaseDate: Date, sold: Bool?) async throws {
         isLoading = true
         errorMessage = nil
         defer { isLoading = false }
@@ -77,7 +78,7 @@ class ProductService {
             throw URLError(.badURL)
         }
         
-        let newProduct = ProductRequest(name: name, sku: Sku, description: description, brand: brand, sold: sold, createdAt: Date.now)
+        let newProduct = ProductRequest(name: name, sku: Sku, description: description, brand: brand, purchasePrice: purchasePrice, purchaseDate: purchaseDate, sold: sold, createdAt: Date.now)
         
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
@@ -127,12 +128,13 @@ class ProductService {
                 var product = self.products[index]
                 product = updatedProduct
                 product.updatedAt = Date.now
+                
                 self.products[index] = product
             }
         }
     }
     
-    func updateProductSold(id: UUID, newSold: Bool) async throws {
+    func updateProductSold(id: UUID, salePrice: Double, saleDate: Date, sold: Bool) async throws {
         guard let url = URL(string: "\(baseURL)/products/\(id)") else {
             throw URLError(.badURL)
         }
@@ -140,7 +142,15 @@ class ProductService {
         var request = URLRequest(url: url)
         request.httpMethod = "PATCH"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.httpBody = try JSONEncoder().encode(ProductSold(sold: newSold))
+        
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        
+        request.httpBody = try encoder.encode(ProductSold(
+            salePrice: salePrice,
+            saleDate: saleDate,
+            sold: sold
+        ))
         
         let (_, response) = try await URLSession.shared.data(for: request)
         
@@ -154,7 +164,9 @@ class ProductService {
         }
         
         var updatedProduct = products[index]
-        updatedProduct.sold = newSold
+        updatedProduct.sold = sold
+        updatedProduct.salePrice = salePrice
+        updatedProduct.saleDate = saleDate
         
         await MainActor.run {
             products[index] = updatedProduct
