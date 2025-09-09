@@ -1,9 +1,9 @@
-# KasperKluns Inventory App
+# kasperkluns Inventory App
 
 <img src="images/kasperkluns_logo.png" alt="Product Image" width="300">
 
 ## 🧾 Overview
-KasperKluns is my personal inventory management application designed for small business specializing in second-hand clothing and footwear. The app helps in tracking stock, managing sales, and organizing products efficiently.
+kasperkluns is my personal inventory management application designed for small business specializing in second-hand clothing and footwear. The app helps in tracking stock, managing sales, and organizing products efficiently.
 
 ## 🛠️ Features
 - Add, edit, and delete product listings
