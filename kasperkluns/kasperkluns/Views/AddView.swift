@@ -4,6 +4,8 @@ struct AddView: View {
     
     @Environment(ProductService.self) private var productService
     
+    @Environment(\.dismiss) private var dismiss
+    
     @State private var name: String = ""
     @State private var sku: Int = 0
     @State private var description: String = ""
@@ -17,6 +19,7 @@ struct AddView: View {
     var body: some View {
         Form {
             Section(header: Text("Add a new Product")) {
+                // Name
                 HStack {
                     Text("Name: ")
                         .bold()
@@ -25,6 +28,7 @@ struct AddView: View {
                 .textFieldStyle(.roundedBorder)
                 .padding(.top, 10)
                 
+                // SKU
                 HStack {
                     Text("Sku: ")
                         .bold()
@@ -50,6 +54,7 @@ struct AddView: View {
                 }
                 .padding(.top, 20)
                 
+                // Description
                 HStack(alignment: .top) {
                     Text("Description: ")
                         .bold()
@@ -62,6 +67,7 @@ struct AddView: View {
                 }
                 .padding(.top, 20)
                 
+                // Brand
                 HStack {
                     Picker("Brand", selection: $brand) {
                         ForEach(Brand.allCases) { brand in
@@ -72,12 +78,14 @@ struct AddView: View {
                     .pickerStyle(.menu)
                 }
                 .padding(.top, 20)
+                .padding(.bottom, 20)
                 
+                // Purchase
                 HStack {
                     Text("Purchase Price:")
                         .bold()
                     Spacer()
-                    TextField("Purchase Price", value: $purchasePrice, format: .currency(code: "DKK"))
+                    TextField("0", value: $purchasePrice, format: .currency(code: "DKK"))
                         .keyboardType(.decimalPad)
                         .multilineTextAlignment(.trailing)
                         .padding(.horizontal, 10)
@@ -91,6 +99,7 @@ struct AddView: View {
                     .padding(.bottom, 15)
             }
             
+            // Add btn
             HStack {
                 Spacer()
                 Button(action: {
@@ -106,7 +115,6 @@ struct AddView: View {
                 .alert("Got it all right?", isPresented: $showConfirmation) {
                     Button("Cancel", role: .cancel) {}
                     Button("Yes", role: .destructive) {
-                        
                          Task {
                          try await productService.addProduct(
                          name: name,
@@ -117,7 +125,7 @@ struct AddView: View {
                          purchaseDate: purchaseDate,
                          sold: sold)
                          }
-                         
+                        dismiss()
                     }
                 } message: {
                     Text("Are you sure")

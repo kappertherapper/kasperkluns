@@ -7,8 +7,8 @@ class ProductService {
     var isLoading = false
     var errorMessage: String?
     
-    private let baseURL = "http://localhost:8080"
-    //private let baseURL = "http://10.44.0.129:8080"
+//    private let baseURL = "http://localhost:8080"
+    private let baseURL = "http://10.44.0.129:8080"
     
 // MARK: - READ
     func fetchProducts() async throws {
@@ -144,8 +144,8 @@ class ProductService {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
         let encoder = JSONEncoder()
-        encoder.dateEncodingStrategy = .iso8601
-        
+        encoder.dateEncodingStrategy = .secondsSince1970
+    
         request.httpBody = try encoder.encode(ProductSold(
             salePrice: salePrice,
             saleDate: saleDate,

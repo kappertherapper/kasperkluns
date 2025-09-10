@@ -15,9 +15,24 @@ struct ContentView: View {
     
     
     var filteredProducts: [ProductReponse] {
+        let calendar = Calendar.current
+        let now = Date()
+        let startOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: now))!
+        let startOfNextMonth = calendar.date(byAdding: .month, value: 1, to: startOfMonth)!
+        let endOfMonth = calendar.date(byAdding: .second, value: -1, to: startOfNextMonth)!
+        //let endofNextMonth = calendar.date(byAdding: .month, value: 1, to: endOfMonth)!
+        
+        
         switch sortOption {
         case "Sold":
             return productService.products.filter { $0.sold }
+        case "Not Sold":
+            return productService.products.filter { !$0.sold }
+        case "This Month":
+            return productService.products.filter {
+                guard let saleDate = $0.saleDate else { return false }
+                return saleDate >= startOfMonth && saleDate <= endOfMonth
+            }
         default:
             return productService.products
         }
@@ -47,18 +62,23 @@ struct ContentView: View {
                         }
                         .padding()
                     } else {
-                        // List
-                        List(filteredProducts) { product in
+                        List(filteredProducts.sorted { $0.sku < $1.sku }, id: \.sku) { product in
                             NavigationLink(destination: DetailView(product: product)) {
-                                HStack(spacing: 10) {
+                                HStack(spacing: 20) {
                                     Text(product.sku.formatted())
                                         .font(.subheadline)
                                         .foregroundColor(.gray)
+                                    HStack {
+                                        if let brand = product.brand {
+                                            Text("\(spacedText(brand.rawValue)) \(product.name)")
+                                                .font(.headline)
+                                                .foregroundColor(.primary)
+                                                .padding(.vertical, 5)
+                                        } else {
+                                            Text("Brand not set").bold()
+                                        }
+                                    }
                                     
-                                    Text(product.name)
-                                        .font(.headline)
-                                        .foregroundColor(.primary)
-                                        .padding(.vertical, 5)
                                     
                                     Spacer()
                                     
@@ -141,15 +161,31 @@ struct ContentView: View {
                     Menu {
                         Button("All") { sortOption = "All" }
                         Button("Sold") { sortOption = "Sold" }
+                        Button("Not Sold") { sortOption = "Not Sold" }
                     } label: {
                         Label("Vælg", systemImage: "chevron.down")
                     }
                 }
             }
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Menu {
+                        Button("This Month") { sortOption = "This Month" }
+                    } label: {
+                        Label("Vælg", systemImage: "calendar.badge.clock")
+                    }
+                }
+            }
+            
             .navigationTitle("Products")
         }
         .sheet(isPresented: $showAddView) {
             AddView()
+        }
+        .onAppear {
+            Task {
+                try await productService.fetchProducts()
+            }
         }
     }
 }

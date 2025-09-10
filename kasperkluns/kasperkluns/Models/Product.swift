@@ -22,6 +22,14 @@ struct Product: Identifiable, Codable {
         self.purchasePrice = response.purchasePrice
         self.salePrice = response.salePrice ?? 0.0
         }
+    
+    func spacedText(_ text: String) -> String {
+        let regex = try! NSRegularExpression(pattern: "([a-z])([A-Z])", options: [])
+        let range = NSRange(location: 0, length: text.utf16.count)
+        return regex.stringByReplacingMatches(in: text, options: [], range: range, withTemplate: "$1 $2")
+    }
+    
+    
     }
 
 enum Brand: String, Codable, CaseIterable, Identifiable {
@@ -33,3 +41,7 @@ enum Brand: String, Codable, CaseIterable, Identifiable {
     
     var id: String { self.rawValue }
 }
+
+
+
+

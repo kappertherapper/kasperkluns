@@ -7,7 +7,7 @@ struct DetailView: View {
     
     var product: ProductReponse
     @State private var showConfirmation = false
-    @State private var showingSheet = false
+    @State private var showingEditSheet = false
     @State private var showingSoldSheet = false
     @State private var sold = false
     
@@ -121,7 +121,7 @@ struct DetailView: View {
                 }
                 
                 Button(action: {
-                    showingSheet = true
+                    showingEditSheet = true
                 }) {
                     Label("Edit", systemImage: "pencil")
                         .font(.headline)
@@ -132,7 +132,7 @@ struct DetailView: View {
                         .cornerRadius(12)
                         .shadow(radius: 3)
                 }
-                .sheet(isPresented: $showingSheet) { EditView(product: product) }
+                .sheet(isPresented: $showingEditSheet) { EditView(product: product) }
                 .sheet(isPresented: $showingSoldSheet) { SaleView(product: product) }
             }
             .padding(.horizontal)
@@ -145,10 +145,10 @@ struct DetailView: View {
 }
     
 func spacedText(_ text: String) -> String {
-        let regex = try! NSRegularExpression(pattern: "([a-z])([A-Z])", options: [])
-        let range = NSRange(location: 0, length: text.utf16.count)
-        return regex.stringByReplacingMatches(in: text, options: [], range: range, withTemplate: "$1 $2")
-    }
+    let regex = try! NSRegularExpression(pattern: "([a-z])([A-Z])", options: [])
+    let range = NSRange(location: 0, length: text.utf16.count)
+    return regex.stringByReplacingMatches(in: text, options: [], range: range, withTemplate: "$1 $2")
+}
 
 
 

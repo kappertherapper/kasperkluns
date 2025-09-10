@@ -7,7 +7,7 @@ public func configure(_ app: Application) async throws {
     // uncomment to serve files from /Public folder
     // app.middleware.use(FileMiddleware(publicDirectory: app.directory.publicDirectory))
     
-    //app.http.server.configuration.hostname = "0.0.0.0"
+    app.http.server.configuration.hostname = "0.0.0.0"
     //app.http.server.configuration.port = 8080
 
     let config = SQLPostgresConfiguration(
@@ -30,7 +30,7 @@ public func configure(_ app: Application) async throws {
     
     app.migrations.add(CreateProductMigration())
     
-    try await app.autoRevert()
+    //try await app.autoRevert()
     try await app.autoMigrate()
     try routes(app)
 
