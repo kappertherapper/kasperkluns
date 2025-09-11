@@ -115,16 +115,16 @@ struct AddView: View {
                 .alert("Got it all right?", isPresented: $showConfirmation) {
                     Button("Cancel", role: .cancel) {}
                     Button("Yes", role: .destructive) {
-                         Task {
-                         try await productService.addProduct(
-                         name: name,
-                         Sku: sku,
-                         description: description,
-                         brand: brand.rawValue,
-                         purchasePrice: purchasePrice ?? 0.0,
-                         purchaseDate: purchaseDate,
-                         sold: sold)
-                         }
+                        Task {
+                            try await productService.addProduct(
+                                name: name,
+                                Sku: sku,
+                                description: description,
+                                brand: brand.rawValue,
+                                purchasePrice: purchasePrice ?? 0.0,
+                                purchaseDate: purchaseDate,
+                                sold: sold)
+                        }
                         dismiss()
                     }
                 } message: {

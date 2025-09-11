@@ -18,9 +18,10 @@ final class Product: Model, @unchecked Sendable {
     @OptionalField(key: "description")
     var description: String?
     
-    @OptionalField(key: "brand")
-    private var _brand: String?
-        
+    @Field(key: "brand")
+    private var brand: Brand
+    
+    /*
     var brand: Brand? {
         get {
             guard let _brand = _brand else { return nil }
@@ -30,6 +31,10 @@ final class Product: Model, @unchecked Sendable {
             _brand = newValue?.rawValue
         }
     }
+     */
+    
+    @Field(key: "size")
+    private var size: Size
     
     @Field(key: "purchase_price")
     var purchasePrice: Double
@@ -64,6 +69,50 @@ enum Brand: String, CaseIterable, Codable {
     case Salomon = "Salomon"
     case adidas = "adidas"
     case Asics = "Asics"
+    case Hoka = "Hoka"
+    case Merrell = "Merrell"
+    case unknown = "unknown"
+}
+
+enum Size: String, Codable, CaseIterable {
+    // Shoe sizes
+    case size36   = "36"
+    case size36_5 = "36.5"
+    case size37   = "37"
+    case size37_5 = "37.5"
+    case size38   = "38"
+    case size38_5 = "38.5"
+    case size39   = "39"
+    case size39_5 = "39.5"
+    case size40   = "40"
+    case size40_5 = "40.5"
+    case size41   = "41"
+    case size41_5 = "41.5"
+    case size42   = "42"
+    case size42_5 = "42.5"
+    case size43   = "43"
+    case size43_5 = "43.5"
+    case size44   = "44"
+    case size44_5 = "44.5"
+    case size45   = "45"
+    case size45_5 = "45.5"
+    case size46   = "46"
+    case size46_5 = "46.5"
+    case size47   = "47"
+    case size47_5 = "47.5"
+    case size48   = "48"
+    case size48_5 = "48.5"
+    case size49   = "49"
+    case size49_5 = "49.5"
+    case size50   = "50"
+
+    // Clothing sizes
+    case XS
+    case S
+    case M
+    case L
+    case XL
+    case XXL
 }
 
 
@@ -88,14 +137,15 @@ extension Product {
         
         if self.id == nil {
             let result = try await sqlDB.raw("""
-                INSERT INTO products (id, sku, name, description, brand, purchase_price, purchase_date, sale_price, sale_date, sold, created_at, updated_at
+                INSERT INTO products (id, sku, name, description, brand, size, purchase_price, purchase_date, sale_price, sale_date, sold, created_at, updated_at
                 ) 
                 VALUES (
                 gen_random_uuid(),
                 \(bind: self.sku),
                 \(bind: self.name),
                 \(bind: self.description),
-                \(bind: self._brand ?? Brand.NewBalance.rawValue)::brand,
+                \(bind: self.brand)::brand,
+                \(bind: self.size)::size,
                 \(bind: self.purchasePrice),
                 \(bind: self.purchaseDate),
                 \(bind: self.salePrice),
@@ -129,15 +179,16 @@ extension Product {
                 SET sku = \(bind: self.sku),
                     name = \(bind: self.name),
                     description = \(bind: self.description),
-                    brand = \(bind: self._brand ?? Brand.NewBalance.rawValue)::brand,
-                    purchasePrice = \(bind: self.purchasePrice),
-                    purchaseDate = \(bind: self.purchaseDate),
-                    salePrice = \(bind: self.salePrice),
-                    saleDate = \(bind: self.saleDate),
+                    brand = \(bind: self.brand)::brand,
+                    size = \(bind: self.size)::size,
+                    purchase_price = \(bind: self.purchasePrice),
+                    purchase_date = \(bind: self.purchaseDate),
+                    sale_price = \(bind: self.salePrice),
+                    sale_date = \(bind: self.saleDate),
                     sold = \(self.sold),
-                    "updatedAt" =  NOW()
+                    "updated_at" =  NOW()
                 WHERE id = \(bind: id)
-                RETURNING id, "updatedAt"
+                RETURNING id, "updated_at"
             """).first()
         
         if let row = result {

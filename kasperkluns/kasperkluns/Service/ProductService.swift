@@ -127,8 +127,6 @@ class ProductService {
             if let index = self.products.firstIndex(where: { $0.id == id }) {
                 var product = self.products[index]
                 product = updatedProduct
-                product.updatedAt = Date.now
-                
                 self.products[index] = product
             }
         }

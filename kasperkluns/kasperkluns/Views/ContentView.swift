@@ -10,11 +10,14 @@ struct ContentView: View {
     @State private var showConfirmation = false
     
     @State private var sortOption: String = "All"
+    @State private var searchText = ""
     
     
     
     
     var filteredProducts: [ProductReponse] {
+        var products = productService.products
+        
         let calendar = Calendar.current
         let now = Date()
         let startOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: now))!
@@ -24,18 +27,31 @@ struct ContentView: View {
         
         
         switch sortOption {
-        case "Sold":
-            return productService.products.filter { $0.sold }
-        case "Not Sold":
-            return productService.products.filter { !$0.sold }
-        case "This Month":
-            return productService.products.filter {
+        case "Sold": return products.filter { $0.sold }
+        case "Not Sold": return products.filter { !$0.sold }
+        case "This Month": return products.filter {
                 guard let saleDate = $0.saleDate else { return false }
                 return saleDate >= startOfMonth && saleDate <= endOfMonth
             }
         default:
-            return productService.products
+            break
         }
+        
+        if !searchText.isEmpty {
+            products = products.filter { product in
+                product.name.localizedCaseInsensitiveContains(searchText) ||
+                product.brand?.rawValue.localizedCaseInsensitiveContains(searchText) == true ||
+                String(product.sku).contains(searchText)
+            }
+        }
+        
+        if sortOption == "Price Low-High" {
+            products = products.sorted { $0.purchasePrice < $1.purchasePrice }
+        } else if sortOption == "Price High-Low" {
+            products = products.sorted { $0.purchasePrice > $1.purchasePrice }
+        }
+        
+        return products.sorted { $0.sku < $1.sku }
     }
     
     var body: some View {
@@ -62,7 +78,7 @@ struct ContentView: View {
                         }
                         .padding()
                     } else {
-                        List(filteredProducts.sorted { $0.sku < $1.sku }, id: \.sku) { product in
+                        List(filteredProducts, id: \.id) { product in
                             NavigationLink(destination: DetailView(product: product)) {
                                 HStack(spacing: 20) {
                                     Text(product.sku.formatted())
@@ -162,6 +178,8 @@ struct ContentView: View {
                         Button("All") { sortOption = "All" }
                         Button("Sold") { sortOption = "Sold" }
                         Button("Not Sold") { sortOption = "Not Sold" }
+                        Button("Price Low-High") { sortOption = "Price Low-High" }
+                        Button("Price High-Low") { sortOption = "Price High-Low" }
                     } label: {
                         Label("Vælg", systemImage: "chevron.down")
                     }
@@ -176,16 +194,16 @@ struct ContentView: View {
                     }
                 }
             }
-            
+            .searchable(text: $searchText, prompt: "Search Products..")
             .navigationTitle("Products")
         }
         .sheet(isPresented: $showAddView) {
             AddView()
-        }
-        .onAppear {
-            Task {
-                try await productService.fetchProducts()
-            }
+                .onDisappear() {
+                    Task {
+                        try await productService.fetchProducts()
+                    }
+                }
         }
     }
 }

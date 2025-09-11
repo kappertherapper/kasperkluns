@@ -24,5 +24,10 @@ func routes(_ app: Application) throws {
         return "Success"
     }
     
+    app.get("backup") { req -> String in
+        DatabaseBackup.backup(on: req.application)
+        return "Backup triggered!"
+    }
+    
     try app.register(collection: ProductController())
 }

@@ -9,10 +9,12 @@ import SwiftUI
 
 @main
 struct kasperklunsApp: App {
+    @State private var productService = ProductService()
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environment(ProductService())
+                .environment(productService)
         }
     }
 }
