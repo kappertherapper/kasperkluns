@@ -73,7 +73,7 @@ struct CreateProductMigration: AsyncMigration {
     
     func revert(on database: any Database) async throws {
         try await database.schema(Product.schema).delete()
-        try await database.enum("brand").delete()
-        try await database.enum("size").delete()
+        //try await database.enum("brand").delete()
+        //try await database.enum("size").delete()
     }
 }

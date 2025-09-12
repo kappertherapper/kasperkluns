@@ -51,7 +51,6 @@ struct ProductController: RouteCollection {
         if purchasePrice <= 0 { //
             throw Abort(.badRequest, reason: "Price is required and must be higher than zero")
         }
-        _ = requestContent.purchaseDate
         
         let product = Product(requestContent: requestContent, name: name, sku: sku)
         
@@ -97,6 +96,7 @@ struct ProductController: RouteCollection {
         product.setvalue(requestContent.name, to: \.name)
         product.setvalue(requestContent.description, to: \.description)
         product.setBrand(requestContent.brand)
+        product.setSize(requestContent.size)
         product.setvalue(requestContent.purchasePrice, to: \.purchasePrice)
         product.setvalue(requestContent.purchaseDate, to: \.purchaseDate)
         product.setvalue(requestContent.salePrice, to: \.salePrice)
@@ -155,9 +155,11 @@ private extension Product {
         }
     }
     
-    func setBrand (_ brandRawValue: String?) {
-        if let brandRawValue {
-            brand = Brand(rawValue: brandRawValue)
-        }
+    func setBrand (_ brandRawValue: String) {
+        _ = Brand(rawValue: brandRawValue)
+    }
+    
+    func setSize (_ sizeRawValue: String) {
+        _ = Size(rawValue: sizeRawValue)
     }
 }

@@ -11,13 +11,15 @@ struct SaleView: View {
     @Environment(ProductService.self) private var productService
     @Environment(\.dismiss) private var dismiss
     
+    @FocusState private var isSalePriceFocused: Bool
+    
     @State private var salePrice: Double? = nil
     @State private var saleDate: Date = Date()
     var product: ProductReponse
     
     var body: some View {
         VStack {
-            Text("\(product.brand?.rawValue ?? "Unknown") \(product.name)")
+            Text("\(product.brand.rawValue) \(product.name)")
                 .font(.title)
                 .bold()
             
@@ -34,6 +36,7 @@ struct SaleView: View {
                     .keyboardType(.decimalPad)
                     .multilineTextAlignment(.trailing)
                     .padding(.horizontal, 10)
+                    .focused($isSalePriceFocused)
             }
             .padding(.bottom, 15)
             
@@ -65,6 +68,11 @@ struct SaleView: View {
                 .padding(50)
                 
         }
+        .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                isSalePriceFocused = true
+            }
+        }
     }
 }
 
@@ -76,6 +84,7 @@ struct SaleView: View {
         name: "990 v4",
         description: "This is a test description for the product.",
         brand: Brand.NewBalance,
+        size: Size.size40,
         purchasePrice: 99.99,
         purchaseDate: Date(),
         salePrice: 100.00,

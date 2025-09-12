@@ -53,9 +53,9 @@ class ProductService {
         }
         
         let (data, response) = try await URLSession.shared.data(from: url)
-            
+        
         guard let httpResponse = response as? HTTPURLResponse,
-            httpResponse.statusCode == 200 else {
+              httpResponse.statusCode == 200 else {
             throw URLError(.badServerResponse)
         }
         
@@ -69,34 +69,45 @@ class ProductService {
     
 //MARK: - ADD
     func addProduct(name: String, Sku: Int, description: String?, brand:
-                    String?, purchasePrice: Double, purchaseDate: Date, sold: Bool?) async throws {
+                    String, size: String, purchasePrice: Double, purchaseDate: Date, sold: Bool?) async throws {
         isLoading = true
         errorMessage = nil
         defer { isLoading = false }
-        
-        guard let url = URL(string: "\(baseURL)/products") else {
-            throw URLError(.badURL)
+        do {
+            guard let url = URL(string: "\(baseURL)/products") else {
+                throw URLError(.badURL)
+            }
+            
+            let newProduct = ProductRequest(name: name,
+                                            sku: Sku,
+                                            description: description,
+                                            brand: brand,
+                                            size: size,
+                                            purchasePrice: purchasePrice,
+                                            purchaseDate: purchaseDate,
+                                            sold: sold)
+            
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            
+            let encoder = JSONEncoder()
+            encoder.dateEncodingStrategy = .iso8601
+            request.httpBody = try encoder.encode(newProduct)
+            
+            let (data, response) = try await URLSession.shared.data(for: request)
+            
+            guard let httpResponse = response as? HTTPURLResponse,
+                  httpResponse.statusCode == 201 else {
+                throw URLError(.badServerResponse)
+            }
+            
+            let product = try JSONDecoder().decode(ProductReponse.self, from: data)
+            products.append(product)
+        } catch {
+            errorMessage = "Failed to add new product: \(error.localizedDescription)"
+            print("Error adding new product: \(error)")
         }
-        
-        let newProduct = ProductRequest(name: name, sku: Sku, description: description, brand: brand, purchasePrice: purchasePrice, purchaseDate: purchaseDate, sold: sold, createdAt: Date.now)
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
-        let encoder = JSONEncoder()
-        encoder.dateEncodingStrategy = .iso8601
-        request.httpBody = try encoder.encode(newProduct)
-        
-        let (data, response) = try await URLSession.shared.data(for: request)
-        
-        guard let httpResponse = response as? HTTPURLResponse,
-              httpResponse.statusCode == 201 else {
-            throw URLError(.badServerResponse)
-        }
-        
-        let product = try JSONDecoder().decode(ProductReponse.self, from: data)
-        products.append(product)
     }
     
 //MARK: - EDIT
@@ -196,6 +207,7 @@ class ProductService {
         }
     }
     
+//MARK: - HELPERS
     func getProductCount() async -> Int {
         do {
             try await fetchProducts()

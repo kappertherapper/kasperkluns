@@ -40,7 +40,7 @@ struct ContentView: View {
         if !searchText.isEmpty {
             products = products.filter { product in
                 product.name.localizedCaseInsensitiveContains(searchText) ||
-                product.brand?.rawValue.localizedCaseInsensitiveContains(searchText) == true ||
+                product.brand.rawValue.localizedCaseInsensitiveContains(searchText) == true ||
                 String(product.sku).contains(searchText)
             }
         }
@@ -85,14 +85,10 @@ struct ContentView: View {
                                         .font(.subheadline)
                                         .foregroundColor(.gray)
                                     HStack {
-                                        if let brand = product.brand {
-                                            Text("\(spacedText(brand.rawValue)) \(product.name)")
-                                                .font(.headline)
-                                                .foregroundColor(.primary)
-                                                .padding(.vertical, 5)
-                                        } else {
-                                            Text("Brand not set").bold()
-                                        }
+                                        Text("\(spacedText(product.brand.rawValue)) \(product.name)")
+                                            .font(.headline)
+                                            .foregroundColor(.primary)
+                                            .padding(.vertical, 5)
                                     }
                                     
                                     

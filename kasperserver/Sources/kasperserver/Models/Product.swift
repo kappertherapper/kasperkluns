@@ -19,7 +19,7 @@ final class Product: Model, @unchecked Sendable {
     var description: String?
     
     @Field(key: "brand")
-    private var brand: Brand
+    var brand: Brand
     
     /*
     var brand: Brand? {
@@ -34,7 +34,7 @@ final class Product: Model, @unchecked Sendable {
      */
     
     @Field(key: "size")
-    private var size: Size
+    var size: Size
     
     @Field(key: "purchase_price")
     var purchasePrice: Double

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct EditView: View {
     @Environment(ProductService.self) private var productService
+    @Environment(\.dismiss) private var dismiss
     @State private var editableProduct: ProductReponse
     var productId: UUID
     
@@ -35,15 +36,80 @@ struct EditView: View {
             .padding(.top, 20)
             
             HStack {
-                Picker("Brand", selection: $editableProduct.brand) {
-                    ForEach(Brand.allCases) { brand in
-                        Text(brand.rawValue).tag(brand)
+                // Brand
+                HStack {
+                    Picker("Brand", selection: $editableProduct.brand) {
+                        ForEach(Brand.allCases) { brand in
+                            Text(brand.rawValue).tag(brand)
+                        }
                     }
+                    .labelsHidden()
+                    .bold()
+                    .pickerStyle(.menu)
                 }
-                .bold()
-                .pickerStyle(.menu)
+                
+                Divider()
+                    .padding(.horizontal, 20)
+                
+                
+                // Size
+                HStack {
+                    Picker("Size", selection: $editableProduct.size) {
+                        ForEach(Size.allCases) { size in
+                            Text(size.rawValue).tag(size)
+                        }
+                    }
+                    .labelsHidden()
+                    .bold()
+                    .pickerStyle(.menu)
+                }
             }
-            .padding(.top, 20)
+            .frame(maxWidth: .infinity, alignment: .center)
+            .padding(.top, 10)
+            .padding(.bottom, 10)
+            
+            // Purchase
+            HStack {
+                Text("Purchase Price:")
+                    .bold()
+                Spacer()
+                TextField("0", value: $editableProduct.purchasePrice, format: .currency(code: "DKK"))
+                    .keyboardType(.decimalPad)
+                    .multilineTextAlignment(.trailing)
+                    .padding(.horizontal, 10)
+            }
+            .padding(.top, 15)
+            .padding(.bottom, 15)
+            
+            DatePicker("Purchase Date:", selection: $editableProduct.purchaseDate, displayedComponents: .date)
+                .bold()
+                .padding(.top, 15)
+                .padding(.bottom, 15)
+            
+            // Sale
+            HStack {
+                Text("Sale Price:")
+                    .bold()
+                Spacer()
+                TextField("0", value: $editableProduct.salePrice, format: .currency(code: "DKK"))
+                    .keyboardType(.decimalPad)
+                    .multilineTextAlignment(.trailing)
+                    .padding(.horizontal, 10)
+            }
+            .padding(.top, 15)
+            .padding(.bottom, 15)
+            
+            DatePicker(
+                "Sale Date:",
+                selection: Binding(
+                    get: { (editableProduct.saleDate ?? Calendar.current.date(from: Calendar.current.dateComponents([.year], from: Date())))! },
+                    set: { editableProduct.saleDate = $0 }
+                ),
+                displayedComponents: .date
+            )
+            .bold()
+            .padding(.top, 15)
+            .padding(.bottom, 15)
             
             
             HStack {
@@ -52,37 +118,55 @@ struct EditView: View {
                 Text("\(editableProduct.sold ? "True" : "False")")
                     .font(.caption)
             }
-            .padding(.top, 20)
-            
-            HStack {
-                Spacer()
-                Button(action: {
-                    showConfirmation.toggle()
-                }) {
-                    Text("Save")
-                        .foregroundColor(.white)
-                        .padding()
-                        .background(Color.purple)
-                        .cornerRadius(10)
-                        .bold()
-                }
-                .alert("Got it all right?", isPresented: $showConfirmation) {
-                    Button("Cancel", role: .cancel) {}
-                    Button("Yes", role: .destructive) {
-                        Task {
-                            try await productService.editProduct(
-                                id: productId,
-                                updatedProduct: editableProduct,
-                            )
-                        }
-                    }
-                } message: {
-                    Text("Are you sure")
-                }
+        }
+        .onChange(of: editableProduct.sold) { oldValue, newValue in
+            if oldValue == true && newValue == false {
+                editableProduct.salePrice = nil
+                editableProduct.saleDate = nil
             }
         }
+        
+        HStack(spacing: 20) {
+            // Cancel button
+            Button(action: {
+                dismiss()
+            }) {
+                Label("Cancel", systemImage: "xmark")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color.red)
+                    .cornerRadius(12)
+                    .shadow(radius: 3)
+            }
+            
+            Spacer()
+            
+            // Save button
+            Button(action: {
+                Task {
+                    try await productService.editProduct(
+                        id: productId,
+                        updatedProduct: editableProduct
+                    )
+                    dismiss()
+                }
+            }) {
+                Label("Save", systemImage: "checkmark")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color.green)
+                    .cornerRadius(12)
+                    .shadow(radius: 3)
+            }
+        }
+        .padding(.horizontal)
     }
 }
+    
 
 
 extension Binding where Value == String? {
@@ -100,9 +184,10 @@ extension Binding where Value == String? {
     @Previewable @State var dummyProduct = ProductReponse(
         id: UUID(),
         sku: 123456,
-        name: "Test Product",
+        name: "990 v4",
         description: "This is a test description for the product.",
-        brand: Brand(rawValue: "Test Brand"),
+        brand: Brand.NewBalance,
+        size: Size.size40,
         purchasePrice: 99.99,
         purchaseDate: Date(),
         salePrice: 100.00,

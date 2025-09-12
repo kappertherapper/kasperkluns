@@ -21,11 +21,7 @@ struct DetailView: View {
                 // Product Info Card
                 VStack(spacing: 8) {
                     HStack {
-                        if let brand = product.brand {
-                            Text(spacedText(brand.rawValue)).font(.title).bold()
-                        } else {
-                            Text("Brand not set").bold()
-                        }
+                        Text(spacedText(product.brand.rawValue)).font(.title).bold()
                         Text(product.name).font(.title).bold()
                     }
                     
@@ -101,7 +97,7 @@ struct DetailView: View {
             // Buttons
             HStack(spacing: 20) {
                 Button(action: {
-                    showConfirmation = true
+                    showingSoldSheet = true
                 }) {
                     Label("Sold", systemImage: product.sold ? "checkmark.circle.fill" : "cart.fill")
                         .font(.headline)
@@ -113,12 +109,8 @@ struct DetailView: View {
                         .shadow(radius: 3)
                 }
                 .disabled(product.sold)
-                .alert("Is this product sold boss?", isPresented: $showConfirmation) {
-                    Button("Yes", role: .destructive, action: { showingSoldSheet = true })
-                    Button("Cancel", role: .cancel) {}
-                } message: {
-                    Text("Are you sure?")
-                }
+                
+                Spacer()
                 
                 Button(action: {
                     showingEditSheet = true
@@ -160,6 +152,7 @@ func spacedText(_ text: String) -> String {
         name: "990 v4",
         description: "This is a test description for the product.",
         brand: Brand.NewBalance,
+        size: Size.size40,
         purchasePrice: 99.99,
         purchaseDate: Date(),
         salePrice: 100.00,

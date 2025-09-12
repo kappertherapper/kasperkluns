@@ -4,7 +4,8 @@ struct ProductRequestContent: Content {
     var name: String
     let sku: Int
     let description: String?
-    let brand: String?
+    let brand: String
+    let size: String
     let purchasePrice: Double
     let purchaseDate: Date
     let salePrice: Double?
@@ -25,6 +26,7 @@ extension Product {
         self.sku = sku
         self.description = requestContent.description
         self.brand = Self.getBrand(requestContent.brand)
+        self.size = Self.getSize(requestContent.size)
         self.purchasePrice = requestContent.purchasePrice
         self.purchaseDate = requestContent.purchaseDate
         self.salePrice = requestContent.salePrice
@@ -32,10 +34,11 @@ extension Product {
         self.sold = requestContent.sold ?? false
     }
     
-    private static func getBrand(_ brand: String?) -> Brand? {
-        guard let brand else { return nil }
-        
-        //print("Converting brand string: '\(brand)'") //Test
-        return Brand(rawValue: brand)
+    private static func getBrand(_ brand: String) -> Brand {
+        return Brand(rawValue: brand) ?? .unknown
+    }
+    
+    private static func getSize(_ size: String) -> Size {
+        return Size(rawValue: size) ?? .size50
     }
 }

@@ -9,7 +9,8 @@ struct AddView: View {
     @State private var name: String = ""
     @State private var sku: Int = 0
     @State private var description: String = ""
-    @State private var brand: Brand = .NewBalance
+    @State private var brand: Brand = .unknown
+    @State private var size: Size = .size40
     @State private var sold: Bool = false
     @State private var purchasePrice: Double? = nil
     @State private var purchaseDate: Date = Date()
@@ -48,11 +49,11 @@ struct AddView: View {
                     .padding(.horizontal, 20)
                     
                     TextField("SKU", value: $sku, format: .number)
-                        .padding(.leading, 50)
+                        .padding(.leading, 60)
                         .font(.largeTitle)
                         .disabled(true)
                 }
-                .padding(.top, 20)
+                .padding(.top, 10)
                 
                 // Description
                 HStack(alignment: .top) {
@@ -67,18 +68,39 @@ struct AddView: View {
                 }
                 .padding(.top, 20)
                 
-                // Brand
                 HStack {
-                    Picker("Brand", selection: $brand) {
-                        ForEach(Brand.allCases) { brand in
-                            Text(brand.rawValue).tag(brand)
+                    // Brand
+                    HStack {
+                        Picker("Brand", selection: $brand) {
+                            ForEach(Brand.allCases) { brand in
+                                Text(brand.rawValue).tag(brand)
+                            }
                         }
+                        .labelsHidden()
+                        .bold()
+                        .pickerStyle(.menu)
                     }
-                    .bold()
-                    .pickerStyle(.menu)
+                    .frame(maxWidth: .infinity)
+                    
+                    Divider()
+                        .padding(.horizontal, 20)
+                        
+                    
+                    // Size
+                    HStack {
+                        Picker("Size", selection: $size) {
+                            ForEach(Size.allCases) { size in
+                                Text(size.rawValue).tag(size)
+                            }
+                        }
+                        .labelsHidden()
+                        .bold()
+                        .pickerStyle(.menu)
+                    }
                 }
-                .padding(.top, 20)
-                .padding(.bottom, 20)
+                .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.top, 10)
+                .padding(.bottom, 10)
                 
                 // Purchase
                 HStack {
@@ -99,37 +121,49 @@ struct AddView: View {
                     .padding(.bottom, 15)
             }
             
-            // Add btn
-            HStack {
-                Spacer()
+            HStack(spacing: 20) {
+                // Cancel Button
                 Button(action: {
-                    showConfirmation.toggle()
+                    dismiss()
                 }) {
-                    Text("Add")
+                    Label("Cancel", systemImage: "xmark")
+                        .font(.headline)
                         .foregroundColor(.white)
                         .padding()
-                        .background(Color.purple)
-                        .cornerRadius(10)
-                        .bold()
+                        .frame(maxWidth: .infinity)
+                        .background(Color.red)
+                        .cornerRadius(12)
+                        .shadow(radius: 3)
                 }
-                .alert("Got it all right?", isPresented: $showConfirmation) {
-                    Button("Cancel", role: .cancel) {}
-                    Button("Yes", role: .destructive) {
-                        Task {
-                            try await productService.addProduct(
-                                name: name,
-                                Sku: sku,
-                                description: description,
-                                brand: brand.rawValue,
-                                purchasePrice: purchasePrice ?? 0.0,
-                                purchaseDate: purchaseDate,
-                                sold: sold)
-                        }
-                        dismiss()
+                
+                Spacer()
+
+                // Add Button
+                Button(action: {
+                    Task {
+                        try await productService.addProduct(
+                            name: name,
+                            Sku: sku,
+                            description: description,
+                            brand: brand.rawValue,
+                            size: size.rawValue,
+                            purchasePrice: purchasePrice ?? 0.0,
+                            purchaseDate: purchaseDate,
+                            sold: sold
+                        )
                     }
-                } message: {
-                    Text("Are you sure")
+                    dismiss()
+                }) {
+                    Label("Add", systemImage: "plus")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color.green)
+                        .cornerRadius(12)
+                        .shadow(radius: 3)
                 }
+                .disabled(sku == 0)
             }
         }
     }
