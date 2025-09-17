@@ -217,6 +217,43 @@ class ProductService {
             return 0
         }
     }
+    
+    func getTotalRevenue() async -> Double {
+        var total = 0.0
+        for product in products {
+            total += product.purchasePrice
+        }
+        return total
+    }
+    
+    func getTotalProfit() async -> Double {
+        var total = 0.0
+        for product in products {
+            if (product.sold == true) {
+                total += product.revenue()
+            }
+        }
+        return total
+    }
+    
+    func getTotalProfitAndCountByMonth(forMonth month: Int, year: Int) async -> (total: Double, count: Int) {
+        var total = 0.0
+        var count = 0
+        let calendar = Calendar.current
+        
+        for product in products {
+            if product.sold, let saleDate = product.saleDate {
+                let saleMonth = calendar.component(.month, from: saleDate)
+                let saleYear = calendar.component(.year, from: saleDate)
+                
+                if saleMonth == month && saleYear == year {
+                    total += product.revenue()
+                    count += 1
+                }
+            }
+        }
+        return (total, count)
+    }
 }
 
 

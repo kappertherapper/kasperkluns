@@ -26,6 +26,7 @@ struct DetailView: View {
                     }
                     
                     Text("SKU: \(product.sku)").font(.subheadline).foregroundColor(.gray)
+                    Text("Size: \(product.size.rawValue)").font(.subheadline).foregroundColor(.gray)
                     Text(product.description?.isEmpty == false ? product.description! : "No description")
                         .italic(product.description?.isEmpty ?? true)
                         .foregroundColor(product.description?.isEmpty == false ? .primary : .gray)

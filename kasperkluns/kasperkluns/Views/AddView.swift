@@ -14,6 +14,7 @@ struct AddView: View {
     @State private var sold: Bool = false
     @State private var purchasePrice: Double? = nil
     @State private var purchaseDate: Date = Date()
+    @State private var count: Int = 0
     
     @State private var showConfirmation = false
     
@@ -120,50 +121,56 @@ struct AddView: View {
                     .padding(.top, 15)
                     .padding(.bottom, 15)
             }
+            .padding(.top)
+        }
+        HStack(spacing: 20) {
+            // Cancel Button
+            Button(action: {
+                dismiss()
+            }) {
+                Label("Cancel", systemImage: "xmark")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color.red)
+                    .cornerRadius(12)
+                    .shadow(radius: 3)
+            }
             
-            HStack(spacing: 20) {
-                // Cancel Button
-                Button(action: {
-                    dismiss()
-                }) {
-                    Label("Cancel", systemImage: "xmark")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color.red)
-                        .cornerRadius(12)
-                        .shadow(radius: 3)
-                }
-                
-                Spacer()
 
-                // Add Button
-                Button(action: {
-                    Task {
-                        try await productService.addProduct(
-                            name: name,
-                            Sku: sku,
-                            description: description,
-                            brand: brand.rawValue,
-                            size: size.rawValue,
-                            purchasePrice: purchasePrice ?? 0.0,
-                            purchaseDate: purchaseDate,
-                            sold: sold
-                        )
-                    }
-                    dismiss()
-                }) {
-                    Label("Add", systemImage: "plus")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color.green)
-                        .cornerRadius(12)
-                        .shadow(radius: 3)
+            // Add Button
+            Button(action: {
+                Task {
+                    try await productService.addProduct(
+                        name: name,
+                        Sku: sku,
+                        description: description,
+                        brand: brand.rawValue,
+                        size: size.rawValue,
+                        purchasePrice: purchasePrice ?? 0.0,
+                        purchaseDate: purchaseDate,
+                        sold: sold
+                    )
                 }
-                .disabled(sku == 0)
+                dismiss()
+            }) {
+                Label("Add", systemImage: "plus")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color.green)
+                    .cornerRadius(12)
+                    .shadow(radius: 3)
+            }
+            .disabled(sku == 0)
+        }
+        .padding(.horizontal, 20)
+        .onAppear {
+            Task {
+                count = await productService.getProductCount()
+                sku = count
             }
         }
     }

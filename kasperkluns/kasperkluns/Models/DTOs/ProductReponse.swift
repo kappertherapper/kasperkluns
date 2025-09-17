@@ -14,7 +14,8 @@ struct ProductReponse: Codable, Identifiable {
     var sold: Bool
     
     func revenue() -> Double {
-        return (salePrice ?? 0.0) - purchasePrice
+        let value = (salePrice ?? 0.0) - purchasePrice
+        return (value * 100).rounded() / 100
     }
 }
 

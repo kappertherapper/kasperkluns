@@ -95,8 +95,8 @@ struct ProductController: RouteCollection {
         let requestContent = try request.content.decode(ProductRequestContent.self)
         product.setvalue(requestContent.name, to: \.name)
         product.setvalue(requestContent.description, to: \.description)
-        product.setBrand(requestContent.brand)
-        product.setSize(requestContent.size)
+        product.setvalue(requestContent.brand, to: \.brand)
+        product.setvalue(requestContent.size, to: \.size)
         product.setvalue(requestContent.purchasePrice, to: \.purchasePrice)
         product.setvalue(requestContent.purchaseDate, to: \.purchaseDate)
         product.setvalue(requestContent.salePrice, to: \.salePrice)
@@ -137,7 +137,7 @@ struct ProductController: RouteCollection {
             throw Abort(.notFound)
         }
         
-        try await product.delete(on: request.db)
+        try await product.delete(force: true, on: request.db)
        
         return HTTPStatus.noContent
     }

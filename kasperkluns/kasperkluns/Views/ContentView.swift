@@ -62,12 +62,13 @@ struct ContentView: View {
                 
                 VStack(spacing: 15) {
                     if productService.isLoading {
-                        ProgressView("Henter produkter..")
+                        ProgressView("Fetching products..")
                             .padding()
                     } else if productService.products.isEmpty {
-                        VStack(spacing: 10) {
+                        VStack(spacing: 15) {
                             Text("No products found")
                                 .foregroundColor(.secondary)
+                                .padding(.top, 50)
                             
                             Button("Refresh") {
                                 Task {
@@ -143,7 +144,7 @@ struct ContentView: View {
                                     do {
                                         try await productService.deleteProduct(id: product.id)
                                     } catch {
-                                        print("Fejl ved sletning: \(error)")
+                                        print("Error deleting product: \(error)")
                                     }
                                 }
                             }
@@ -177,7 +178,7 @@ struct ContentView: View {
                         Button("Price Low-High") { sortOption = "Price Low-High" }
                         Button("Price High-Low") { sortOption = "Price High-Low" }
                     } label: {
-                        Label("Vælg", systemImage: "chevron.down")
+                        Label("", systemImage: "chevron.down")
                     }
                 }
             }
@@ -186,11 +187,11 @@ struct ContentView: View {
                     Menu {
                         Button("This Month") { sortOption = "This Month" }
                     } label: {
-                        Label("Vælg", systemImage: "calendar.badge.clock")
+                        Label("", systemImage: "calendar.badge.clock")
                     }
                 }
             }
-            .searchable(text: $searchText, prompt: "Search Products..")
+            .searchable(text: $searchText, prompt: "")
             .navigationTitle("Products")
         }
         .sheet(isPresented: $showAddView) {

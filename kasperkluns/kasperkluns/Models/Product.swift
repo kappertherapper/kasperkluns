@@ -9,10 +9,6 @@ struct Product: Identifiable, Codable {
     var size: Size
     let purchasePrice: Double
     let salePrice: Double
-
-    var revenue: Double {
-        salePrice - purchasePrice
-    }
     
     init(from response: ProductReponse) {
         self.id = response.id
@@ -88,6 +84,37 @@ enum Size: String, Codable, CaseIterable, Identifiable {
     case XXL
     
     var id: String { self.rawValue }
+}
+
+enum Month: Int, CaseIterable, Identifiable {
+    case january = 1, february, march, april, may, june, july, august, september, october, november, december
+    
+    var id: Int { rawValue }
+    
+    var name: String {
+        switch self {
+        case .january: return "January"
+        case .february: return "February"
+        case .march: return "March"
+        case .april: return "April"
+        case .may: return "May"
+        case .june: return "June"
+        case .july: return "July"
+        case .august: return "August"
+        case .september: return "September"
+        case .october: return "October"
+        case .november: return "November"
+        case .december: return "December"
+        }
+    }
+}
+
+enum Year: Int, CaseIterable, Identifiable {
+    case y2024 = 2024
+    case y2025 = 2025
+    case y2026 = 2026
+    
+    var id: Int { rawValue }
 }
 
 

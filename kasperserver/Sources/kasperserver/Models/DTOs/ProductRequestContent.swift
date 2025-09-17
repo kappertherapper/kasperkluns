@@ -4,8 +4,8 @@ struct ProductRequestContent: Content {
     var name: String
     let sku: Int
     let description: String?
-    let brand: String
-    let size: String
+    let brand: Brand
+    let size: Size
     let purchasePrice: Double
     let purchaseDate: Date
     let salePrice: Double?
@@ -25,8 +25,8 @@ extension Product {
         self.name = name
         self.sku = sku
         self.description = requestContent.description
-        self.brand = Self.getBrand(requestContent.brand)
-        self.size = Self.getSize(requestContent.size)
+        self.brand = requestContent.brand
+        self.size = requestContent.size
         self.purchasePrice = requestContent.purchasePrice
         self.purchaseDate = requestContent.purchaseDate
         self.salePrice = requestContent.salePrice
