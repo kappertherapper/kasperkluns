@@ -11,7 +11,7 @@ kasperkluns is my personal inventory management application designed for small b
 - Search and filter products.
 - Revenue & Profit Dashboard.
 
-## Tools and Technologies
+## 🧰 Tools and Technologies
 - Backend built with [Vapor](https://github.com/vapor/vapor#readme) and [PostgreSQL](https://www.postgresql.org/docs/) for efficient data management.
 - Database migrations managed via [Fluent](https://docs.vapor.codes/4.0/fluent/).
 - Frontend built with SwiftUI.
