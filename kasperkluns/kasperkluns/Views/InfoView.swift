@@ -10,17 +10,22 @@ import SwiftUI
 struct InfoView: View {
     @Environment(ProductService.self) private var productService
     @State private var totalProfit = 0.0
+    @State private var totalProfitByMonth = 0.0
+    @State private var totalProfitByQuarter = 0.0
     @State private var totalRevenue = 0.0
     @State private var totalProcent = 0.0
-    @State private var totalProfitByMonth = 0.0
+    @State private var quarterVAT = 0.0
+    
     @State private var totalProfitByMonthCount = 0
+    
     @State private var selectedMonth: Month = .january
+    @State private var selectedQuarter: Quarter = .Q1
     @State private var selectedYear: Year = .y2024
     
     var body: some View {
         ScrollView {
             Text("Let's talk molar").font(.title).fontWeight(.bold)
-                .padding(.bottom, 100)
+
             
             VStack(spacing: 20) {
                 // MARK: - Total Turnover & Revenue
@@ -30,7 +35,7 @@ struct InfoView: View {
                         Text("Revenue")
                             .font(.title2)
                             .bold()
-                        
+            
                         Text("\(totalRevenue, specifier: "%.2f") kr")
                             .bold()
                             .italic()
@@ -104,7 +109,7 @@ struct InfoView: View {
                     Button {
                         Task {
                                 let result = await productService.getTotalProfitAndCountByMonth(
-                                    forMonth: selectedMonth.rawValue,
+                                    month: selectedMonth.rawValue,
                                     year: selectedYear.rawValue
                                 )
                                 
@@ -126,6 +131,68 @@ struct InfoView: View {
                 }
                 .padding()
                 .background(Color.yellow.opacity(0.15))
+                .cornerRadius(12)
+                .padding(.horizontal)
+                
+                // MARK: - Revenue by Quarter
+                VStack(spacing: 15) {
+                    Text("Profit by Quarter")
+                        .font(.title2)
+                        .bold()
+                    
+                    Picker("Quarter", selection: $selectedQuarter) {
+                        ForEach(Quarter.allCases) { quarter in
+                            Text("Q\(quarter.rawValue)").tag(quarter)
+                        }
+                    }
+                    
+                    HStack {
+                        Text("Profit:")
+                            .italic()
+                            .foregroundColor(.gray)
+                        Spacer()
+                        Text("\(totalProfitByQuarter, specifier: "%.2f") kr")
+                            .bold()
+                            .foregroundColor(.blue)
+                    }
+                    .padding()
+                    .background(Color.gray.opacity(0.1))
+                    .cornerRadius(10)
+                    
+                    HStack {
+                        Text("VAT:")
+                            .italic()
+                            .foregroundColor(.gray)
+                        Spacer()
+                        Text("\(quarterVAT, specifier: "%.2f") kr")
+                            .bold()
+                            .foregroundColor(.blue)
+                    }
+                    .padding()
+                    .background(Color.gray.opacity(0.1))
+                    .cornerRadius(10)
+                    
+                    Button {
+                        Task {
+                            totalProfitByQuarter = await productService.getTotalProfitByQuarter(quarter: selectedQuarter.rawValue)
+                            quarterVAT = totalProfitByQuarter * 0.20
+                        }
+                        
+                    } label: {
+                        HStack {
+                            Image(systemName: "bolt.fill")
+                            Text("Calculate")
+                                .bold()
+                        }
+                        .padding(15)
+                        .background(Color.green)
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
+                        .shadow(radius: 3)
+                    }
+                }
+                .padding()
+                .background(Color.orange.opacity(0.15))
                 .cornerRadius(12)
                 .padding(.horizontal)
             }

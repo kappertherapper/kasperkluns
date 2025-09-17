@@ -114,7 +114,13 @@ enum Year: Int, CaseIterable, Identifiable {
     case y2025 = 2025
     case y2026 = 2026
     
-    var id: Int { rawValue }
+    var id: Int { self.rawValue }
+}
+
+enum Quarter: Int, CaseIterable, Identifiable {
+    case Q1 = 1, Q2, Q3, Q4
+    
+    var id: Int { self.rawValue }
 }
 
 

@@ -12,11 +12,27 @@ struct ContentView: View {
     @State private var sortOption: String = "All"
     @State private var searchText = ""
     
-    
-    
+    let dummyProducts: [ProductReponse] = [
+        ProductReponse(
+            id: UUID(),
+            sku: 123456,
+            name: "990 v69",
+            description: "This is a test description for the product.",
+            brand: Brand.NewBalance,
+            size: Size.size40,
+            purchasePrice: 99.99,
+            purchaseDate: Date(),
+            salePrice: 100.00,
+            saleDate: Date(),
+            sold: false,
+        ),
+    ]
     
     var filteredProducts: [ProductReponse] {
         var products = productService.products
+        if products.isEmpty {
+            products = dummyProducts
+        }
         
         let calendar = Calendar.current
         let now = Date()
@@ -55,7 +71,7 @@ struct ContentView: View {
     }
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ZStack {
                 Color(.systemGray6)
                     .ignoresSafeArea()
@@ -64,20 +80,6 @@ struct ContentView: View {
                     if productService.isLoading {
                         ProgressView("Fetching products..")
                             .padding()
-                    } else if productService.products.isEmpty {
-                        VStack(spacing: 15) {
-                            Text("No products found")
-                                .foregroundColor(.secondary)
-                                .padding(.top, 50)
-                            
-                            Button("Refresh") {
-                                Task {
-                                    try await productService.fetchProducts()
-                                }
-                            }
-                            .buttonStyle(.bordered)
-                        }
-                        .padding()
                     } else {
                         List(filteredProducts, id: \.id) { product in
                             NavigationLink(destination: DetailView(product: product)) {
@@ -91,8 +93,7 @@ struct ContentView: View {
                                             .foregroundColor(.primary)
                                             .padding(.vertical, 5)
                                     }
-                                    
-                                    
+
                                     Spacer()
                                     
                                     if product.sold  {
@@ -104,6 +105,9 @@ struct ContentView: View {
                                     }
                                 }
                             }
+                            
+                            
+                            
                             .swipeActions {
                                 Button(role: .destructive) {
                                     selectedItem = product
@@ -115,6 +119,24 @@ struct ContentView: View {
                             
                         }
                         .listStyle(.plain)
+                        
+                        if productService.products.isEmpty {
+                            VStack(spacing: 15) {
+                                Text("Server offline, showing dummy data")
+                                    .foregroundColor(.secondary)
+                                Text("No products found")
+                                    .foregroundColor(.secondary)
+                                
+                                Button("Refresh") {
+                                    Task {
+                                        try await productService.fetchProducts()
+                                    }
+                                }
+                                .buttonStyle(.bordered)
+                                .padding(.bottom, 200)
+                            }
+                            .padding()
+                        }
                         
                         // Add button
                         Button(action: {
@@ -188,6 +210,14 @@ struct ContentView: View {
                         Button("This Month") { sortOption = "This Month" }
                     } label: {
                         Label("", systemImage: "calendar.badge.clock")
+                    }
+                }
+            }
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    NavigationLink(destination: InfoView()) {
+                        Image(systemName: "chart.line.uptrend.xyaxis")
+                            .padding()
                     }
                 }
             }

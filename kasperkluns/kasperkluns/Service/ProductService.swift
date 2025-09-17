@@ -236,7 +236,7 @@ class ProductService {
         return total
     }
     
-    func getTotalProfitAndCountByMonth(forMonth month: Int, year: Int) async -> (total: Double, count: Int) {
+    func getTotalProfitAndCountByMonth(month: Int, year: Int) async -> (total: Double, count: Int) {
         var total = 0.0
         var count = 0
         let calendar = Calendar.current
@@ -253,6 +253,23 @@ class ProductService {
             }
         }
         return (total, count)
+    }
+    
+    func getTotalProfitByQuarter(quarter: Int) async -> Double {
+        var total = 0.0
+        let calendar = Calendar.current
+        
+        for product in products {
+            if product.sold, let saleDate = product.saleDate {
+                let saleMonth = calendar.component(.month, from: saleDate)
+                let saleQuarter = (saleMonth - 1) / 3 + 1
+                
+                if saleQuarter == quarter  {
+                    total += product.revenue()
+                }
+            }
+        }
+        return total
     }
 }
 
