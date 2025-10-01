@@ -19,12 +19,11 @@ struct Product: Identifiable, Codable {
         self.size = response.size
         self.purchasePrice = response.purchasePrice
         self.salePrice = response.salePrice ?? 0.0
+        
+        func revenue() -> Double {
+            let value = (salePrice) - purchasePrice
+            return (value * 100).rounded() / 100
         }
-    
-    func spacedText(_ text: String) -> String {
-        let regex = try! NSRegularExpression(pattern: "([a-z])([A-Z])", options: [])
-        let range = NSRange(location: 0, length: text.utf16.count)
-        return regex.stringByReplacingMatches(in: text, options: [], range: range, withTemplate: "$1 $2")
     }
 }
 
@@ -110,11 +109,12 @@ enum Month: Int, CaseIterable, Identifiable {
 }
 
 enum Year: Int, CaseIterable, Identifiable {
-    case y2024 = 2024
     case y2025 = 2025
     case y2026 = 2026
     
-    var id: Int { self.rawValue }
+    var id: Int { rawValue }
+    
+    var description: String { "\(rawValue)" }
 }
 
 enum Quarter: Int, CaseIterable, Identifiable {
@@ -123,6 +123,13 @@ enum Quarter: Int, CaseIterable, Identifiable {
     var id: Int { self.rawValue }
 }
 
+//MARK: - Helpers
+
+func spacedText(_ text: String) -> String {
+    let regex = try! NSRegularExpression(pattern: "([a-z])([A-Z])", options: [])
+    let range = NSRange(location: 0, length: text.utf16.count)
+    return regex.stringByReplacingMatches(in: text, options: [], range: range, withTemplate: "$1 $2")
+}
 
 
 

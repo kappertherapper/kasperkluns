@@ -8,6 +8,5 @@ struct ProductRequest: Codable {
     let size: String
     let purchasePrice: Double
     let purchaseDate: Date
-    let sold: Bool?
 }
 

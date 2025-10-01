@@ -11,7 +11,7 @@ struct ProductResponseContent: Content {
     let purchaseDate: Date
     let salePrice: Double?
     let saleDate: Date?
-    let sold: Bool?
+    let sold: Bool
 }
 
 // MARK: - Helper

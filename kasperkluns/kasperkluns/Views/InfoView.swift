@@ -20,17 +20,13 @@ struct InfoView: View {
     
     @State private var selectedMonth: Month = .january
     @State private var selectedQuarter: Quarter = .Q1
-    @State private var selectedYear: Year = .y2024
+    @State private var selectedYear: Year = .y2025
     
     var body: some View {
         ScrollView {
-            Text("Let's talk molar").font(.title).fontWeight(.bold)
-
-            
             VStack(spacing: 20) {
-                // MARK: - Total Turnover & Revenue
                 HStack(spacing: 20) {
-                    // Total Turnover
+                    // Revenue
                     VStack(spacing: 12) {
                         Text("Revenue")
                             .font(.title2)
@@ -48,7 +44,7 @@ struct InfoView: View {
                     .background(Color.blue.opacity(0.15))
                     .cornerRadius(12)
                     
-                    // Total Revenue
+                    // Profit
                     VStack(spacing: 12) {
                         Text("Profit")
                             .font(.title2)
@@ -67,11 +63,10 @@ struct InfoView: View {
                     .frame(maxWidth: .infinity)
                     .background(Color.green.opacity(0.15))
                     .cornerRadius(12)
-
                 }
                 .padding(.horizontal)
                 
-                // MARK: - Revenue by Month
+                // Profit by month
                 VStack(spacing: 15) {
                     Text("Profit by Month")
                         .font(.title2)
@@ -87,7 +82,7 @@ struct InfoView: View {
                         
                         Picker("Year", selection: $selectedYear) {
                             ForEach(Year.allCases) { year in
-                                Text("\(year.rawValue)").tag(year)
+                                Text("\(year.description)").tag(year)
                             }
                         }
                         .pickerStyle(MenuPickerStyle())
@@ -106,13 +101,13 @@ struct InfoView: View {
                     .background(Color.gray.opacity(0.1))
                     .cornerRadius(10)
                     
+                    //Calculate btn
                     Button {
                         Task {
                                 let result = await productService.getTotalProfitAndCountByMonth(
                                     month: selectedMonth.rawValue,
                                     year: selectedYear.rawValue
                                 )
-                                
                                 totalProfitByMonth = result.total
                                 totalProfitByMonthCount = result.count
                             }
@@ -134,7 +129,7 @@ struct InfoView: View {
                 .cornerRadius(12)
                 .padding(.horizontal)
                 
-                // MARK: - Revenue by Quarter
+                // Revenue by Quarter
                 VStack(spacing: 15) {
                     Text("Profit by Quarter")
                         .font(.title2)
@@ -172,12 +167,12 @@ struct InfoView: View {
                     .background(Color.gray.opacity(0.1))
                     .cornerRadius(10)
                     
+                    //Calculate btn
                     Button {
                         Task {
                             totalProfitByQuarter = await productService.getTotalProfitByQuarter(quarter: selectedQuarter.rawValue)
                             quarterVAT = totalProfitByQuarter * 0.20
                         }
-                        
                     } label: {
                         HStack {
                             Image(systemName: "bolt.fill")
@@ -208,7 +203,6 @@ struct InfoView: View {
         }
     }
 }
-
 
 #Preview {
     InfoView()

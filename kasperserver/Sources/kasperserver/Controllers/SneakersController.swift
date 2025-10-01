@@ -1,36 +1,36 @@
 import Vapor
 
-struct ProductController: RouteCollection {
+struct SneakersController: RouteCollection {
     func boot(routes: any RoutesBuilder) throws {
-        let products = routes.grouped("products")
+        let sneakers = routes.grouped("sneakers")
         
         // Create
-        products.post { request in
+        sneakers.post { request in
             try await createProduct(request: request)
         }
         
         // Read all
-        products.get { request in
+        sneakers.get { request in
             try await getProducts(request: request)
         }
     
-        // Read
-        products.get(":id") { request in
+        // Read one
+        sneakers.get(":id") { request in
             try await getProduct(request: request)
         }
         
         // Update
-        products.put(":id") { request in
+        sneakers.put(":id") { request in
             try await updateProduct(request: request)
         }
         
         // Update sold
-        products.patch(":id") { request in
+        sneakers.patch(":id") { request in
             try await updateProductSold(request: request)
         }
         
         // Delete
-        products.delete(":id") { request in
+        sneakers.delete(":id") { request in
             try await deleteProduct(request: request)
         }
     }
@@ -53,8 +53,8 @@ struct ProductController: RouteCollection {
         }
         
         let product = Product(requestContent: requestContent, name: name, sku: sku)
-        product.sold = false
         
+        // Log the values being inserted
         //print("Inserting brand value: '\(product.brand?.rawValue ?? "nil")'")
         //print("Brand enum case: \(String(describing: product.brand))")
         
@@ -150,5 +150,13 @@ private extension Product {
         if let value {
             self[keyPath: keyPath] = value
         }
+    }
+    
+    func setBrand (_ brandRawValue: String) {
+        _ = Brand(rawValue: brandRawValue)
+    }
+    
+    func setSize (_ sizeRawValue: String) {
+        _ = Size(rawValue: sizeRawValue)
     }
 }

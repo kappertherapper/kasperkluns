@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct ContentView: View {
+struct CollectionView: View {
     
     @Environment(ProductService.self) private var productService
     @State private var selectedItem: ProductReponse? = nil
@@ -231,6 +231,6 @@ struct ContentView: View {
 }
     
     #Preview {
-        ContentView()
+        CollectionView()
             .environment(ProductService())
     }

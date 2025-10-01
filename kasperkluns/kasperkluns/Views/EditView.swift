@@ -15,157 +15,161 @@ struct EditView: View {
     
     var body: some View {
         Form {
-            HStack {
-                Text("Name: ")
-                    .bold()
-                TextField("", text: $editableProduct.name)
-            }
-            .textFieldStyle(.roundedBorder)
-            .padding(.top, 10)
-            
-            HStack(alignment: .top) {
-                Text("Description: ")
-                    .bold()
-                
-                TextEditor(text: $editableProduct.description.defaultValue(""))
-                    .padding(4)
-                    .background(Color.gray.opacity(0.2))
-                    .cornerRadius(8)
-                    .frame(height: 100)
-            }
-            .padding(.top, 20)
-            
-            HStack {
-                // Brand
+            Section(header: Text("Edit Product")) {
+                // Name
                 HStack {
-                    Picker("Brand", selection: $editableProduct.brand) {
-                        ForEach(Brand.allCases) { brand in
-                            Text(brand.rawValue).tag(brand)
-                        }
-                    }
-                    .labelsHidden()
-                    .bold()
-                    .pickerStyle(.menu)
+                    Text("Name: ")
+                        .bold()
+                    TextField("", text: $editableProduct.name)
                 }
+                .textFieldStyle(.roundedBorder)
+                .padding(.top, 10)
                 
-                Divider()
-                    .padding(.horizontal, 20)
+                // Description
+                HStack(alignment: .top) {
+                    Text("Description: ")
+                        .bold()
+                    
+                    TextEditor(text: $editableProduct.description.defaultValue(""))
+                        .padding(4)
+                        .background(Color.gray.opacity(0.2))
+                        .cornerRadius(8)
+                        .frame(height: 100)
+                }
+                .padding(.top, 10)
                 
-                
-                // Size
                 HStack {
-                    Picker("Size", selection: $editableProduct.size) {
-                        ForEach(Size.allCases) { size in
-                            Text(size.rawValue).tag(size)
+                    // Brand
+                    HStack {
+                        Picker("Brand", selection: $editableProduct.brand) {
+                            ForEach(Brand.allCases) { brand in
+                                Text(brand.rawValue).tag(brand)
+                            }
                         }
+                        .labelsHidden()
+                        .bold()
+                        .pickerStyle(.menu)
                     }
-                    .labelsHidden()
-                    .bold()
-                    .pickerStyle(.menu)
+                    
+                    Divider()
+                        .padding(.horizontal, 25)
+                
+                    // Size
+                    HStack {
+                        Picker("Size", selection: $editableProduct.size) {
+                            ForEach(Size.allCases) { size in
+                                Text(size.rawValue).tag(size)
+                            }
+                        }
+                        .labelsHidden()
+                        .bold()
+                        .pickerStyle(.menu)
+                    }
                 }
-            }
-            .frame(maxWidth: .infinity, alignment: .center)
-            .padding(.top, 10)
-            .padding(.bottom, 10)
-            
-            // Purchase
-            HStack {
-                Text("Purchase Price:")
+                .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.vertical, 10)
+                
+                // Purchase
+                HStack {
+                    Text("Purchase Price:")
+                        .bold()
+                    
+                    Spacer()
+                    
+                    TextField("0", value: $editableProduct.purchasePrice, format: .currency(code: "DKK"))
+                        .keyboardType(.decimalPad)
+                        .multilineTextAlignment(.trailing)
+                        .padding(.horizontal, 10)
+                }
+                .padding(5)
+                
+                DatePicker("Purchase Date:", selection: $editableProduct.purchaseDate, displayedComponents: .date)
                     .bold()
-                Spacer()
-                TextField("0", value: $editableProduct.purchasePrice, format: .currency(code: "DKK"))
-                    .keyboardType(.decimalPad)
-                    .multilineTextAlignment(.trailing)
-                    .padding(.horizontal, 10)
-            }
-            .padding(.top, 15)
-            .padding(.bottom, 15)
-            
-            DatePicker("Purchase Date:", selection: $editableProduct.purchaseDate, displayedComponents: .date)
+                    .padding(5)
+                
+                // Sale
+                HStack {
+                    Text("Sale Price:")
+                        .bold()
+                        .padding(5)
+                    
+                    Spacer()
+                    
+                    TextField("0", value: $editableProduct.salePrice, format: .currency(code: "DKK"))
+                        .keyboardType(.decimalPad)
+                        .multilineTextAlignment(.trailing)
+                        .padding(.horizontal, 10)
+                }
+                .padding(5)
+                
+                DatePicker(
+                    "Sale Date:",
+                    selection: Binding(
+                        get: { (editableProduct.saleDate ?? Calendar.current.date(from: Calendar.current.dateComponents([.year], from: Date())))! },
+                        set: { editableProduct.saleDate = $0 }
+                    ),
+                    displayedComponents: .date
+                )
                 .bold()
-                .padding(.top, 15)
-                .padding(.bottom, 15)
-            
-            // Sale
-            HStack {
-                Text("Sale Price:")
-                    .bold()
-                Spacer()
-                TextField("0", value: $editableProduct.salePrice, format: .currency(code: "DKK"))
-                    .keyboardType(.decimalPad)
-                    .multilineTextAlignment(.trailing)
-                    .padding(.horizontal, 10)
-            }
-            .padding(.top, 15)
-            .padding(.bottom, 15)
-            
-            DatePicker(
-                "Sale Date:",
-                selection: Binding(
-                    get: { (editableProduct.saleDate ?? Calendar.current.date(from: Calendar.current.dateComponents([.year], from: Date())))! },
-                    set: { editableProduct.saleDate = $0 }
-                ),
-                displayedComponents: .date
-            )
-            .bold()
-            .padding(.top, 15)
-            .padding(.bottom, 15)
-            
-            
-            HStack {
-                Toggle("Sold?", isOn: $editableProduct.sold)
-                    .bold()
-                Text("\(editableProduct.sold ? "True" : "False")")
-                    .font(.caption)
-            }
-        }
-        .onChange(of: editableProduct.sold) { oldValue, newValue in
-            if oldValue == true && newValue == false {
-                editableProduct.salePrice = nil
-                editableProduct.saleDate = nil
-            }
-        }
-        
-        HStack(spacing: 20) {
-            // Cancel button
-            Button(action: {
-                dismiss()
-            }) {
-                Label("Cancel", systemImage: "xmark")
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(Color.red)
-                    .cornerRadius(12)
-                    .shadow(radius: 3)
-            }
-            
-            Spacer()
-            
-            // Save button
-            Button(action: {
-                Task {
-                    try await productService.editProduct(
-                        id: productId,
-                        updatedProduct: editableProduct
-                    )
-                    dismiss()
+                .padding(5)
+                
+                
+                HStack {
+                    Toggle("Sold?", isOn: $editableProduct.sold)
+                        .bold()
+                    Text("\(editableProduct.sold ? "True" : "False")")
+                        .font(.caption)
                 }
-            }) {
-                Label("Save", systemImage: "checkmark")
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(Color.green)
-                    .cornerRadius(12)
-                    .shadow(radius: 3)
+                .padding(5)
+            }
+            .onChange(of: editableProduct.sold) { oldValue, newValue in
+                if oldValue == true && newValue == false {
+                    editableProduct.salePrice = nil
+                    editableProduct.saleDate = nil
+                }
             }
         }
-        .padding(.horizontal)
+            HStack(spacing: 20) {
+                // Cancel button
+                Button(action: {
+                    dismiss()
+                }) {
+                    Label("Cancel", systemImage: "xmark")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color.red)
+                        .cornerRadius(12)
+                        .shadow(radius: 3)
+                }
+                
+                Spacer()
+                
+                // Save button
+                Button(action: {
+                    Task {
+                        try await productService.editProduct(
+                            id: productId,
+                            updatedProduct: editableProduct
+                        )
+                        dismiss()
+                    }
+                }) {
+                    Label("Save", systemImage: "checkmark")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color.green)
+                        .cornerRadius(12)
+                        .shadow(radius: 3)
+                }
+            }
+            .padding(.horizontal)
+        }
     }
-}
+
     
 
 
@@ -177,8 +181,6 @@ extension Binding where Value == String? {
         )
     }
 }
-
-
 
 #Preview {
     @Previewable @State var dummyProduct = ProductReponse(
@@ -197,4 +199,3 @@ extension Binding where Value == String? {
     EditView(product: dummyProduct)
         .environment(ProductService())
 }
-

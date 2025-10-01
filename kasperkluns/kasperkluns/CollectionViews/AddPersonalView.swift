@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct AddView: View {
+struct AddPersonalView: View {
     
     @Environment(ProductService.self) private var productService
     
@@ -170,6 +170,6 @@ struct AddView: View {
 }
 
 #Preview {
-    AddView()
+    AddPersonalView()
         .environment(ProductService())
 }

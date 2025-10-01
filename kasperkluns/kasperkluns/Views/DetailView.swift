@@ -18,13 +18,12 @@ struct DetailView: View {
             Spacer()
 
             VStack(spacing: 20) {
-                // Product Info Card
+                // Product
                 VStack(spacing: 8) {
                     HStack {
                         Text(spacedText(product.brand.rawValue)).font(.title).bold()
                         Text(product.name).font(.title).bold()
                     }
-                    
                     Text("SKU: \(product.sku)").font(.subheadline).foregroundColor(.gray)
                     Text("Size: \(product.size.rawValue)").font(.subheadline).foregroundColor(.gray)
                     Text(product.description?.isEmpty == false ? product.description! : "No description")
@@ -37,7 +36,7 @@ struct DetailView: View {
                 .shadow(radius: 2)
                 .frame(maxWidth: 400)
 
-                // Purchase Info Card
+                // Purchase
                 VStack(spacing: 10) {
                     Text("Purchase Info").font(.headline)
                     HStack {
@@ -52,7 +51,7 @@ struct DetailView: View {
                 .cornerRadius(12)
                 .frame(maxWidth: 400)
 
-                // Sale Info Card
+                // Sale
                 VStack(spacing: 10) {
                     Text("Sale Info").font(.headline)
                     HStack {
@@ -61,7 +60,9 @@ struct DetailView: View {
                         } else {
                             Text("Sale Price not set").italic().foregroundColor(.gray)
                         }
+                        
                         Spacer()
+                        
                         if let date = product.saleDate {
                             Text("Date: \(date.formatted(date: .abbreviated, time: .omitted))")
                         } else {
@@ -75,7 +76,7 @@ struct DetailView: View {
                 .cornerRadius(12)
                 .frame(maxWidth: 400)
                 
-                // Revenue Info Card
+                // Revenue
                 VStack(spacing: 10) {
                     Text("Revenue").font(.headline)
                     HStack {
@@ -91,12 +92,11 @@ struct DetailView: View {
                 
             }
             .padding()
-            Spacer() // fylder bunden og centrerer alt lodret
-        
             
+            Spacer()
             
-            // Buttons
             HStack(spacing: 20) {
+                // Sold btn
                 Button(action: {
                     showingSoldSheet = true
                 }) {
@@ -113,6 +113,7 @@ struct DetailView: View {
                 
                 Spacer()
                 
+                // Edit btn
                 Button(action: {
                     showingEditSheet = true
                 }) {
@@ -136,15 +137,6 @@ struct DetailView: View {
         .background(Color(.systemGroupedBackground))
     }
 }
-    
-func spacedText(_ text: String) -> String {
-    let regex = try! NSRegularExpression(pattern: "([a-z])([A-Z])", options: [])
-    let range = NSRange(location: 0, length: text.utf16.count)
-    return regex.stringByReplacingMatches(in: text, options: [], range: range, withTemplate: "$1 $2")
-}
-
-
-
 #Preview {
     
     @Previewable @State var dummyProduct = ProductReponse(

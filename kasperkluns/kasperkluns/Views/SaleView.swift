@@ -8,14 +8,14 @@
 import SwiftUI
 
 struct SaleView: View {
-    @Environment(ProductService.self) private var productService
-    @Environment(\.dismiss) private var dismiss
-    
-    @FocusState private var isSalePriceFocused: Bool
-    
+    let product: ProductReponse
     @State private var salePrice: Double? = nil
     @State private var saleDate: Date = Date()
-    var product: ProductReponse
+    
+    @Environment(ProductService.self) private var productService
+    @Environment(\.dismiss) private var dismiss
+
+    @FocusState private var isSalePriceFocused: Bool
     
     var body: some View {
         VStack {
@@ -42,8 +42,6 @@ struct SaleView: View {
             
             DatePicker("Sale Date:", selection: $saleDate, displayedComponents: .date)
                 .font(.title3)
-            
-            
         }
         .padding()
         
@@ -57,16 +55,15 @@ struct SaleView: View {
             }
             dismiss()
         }) {
-            Text("Save Sale")
+            Text("Save")
                 .font(.title2)
-                .foregroundColor(.white)
+                .foregroundColor(.black)
                 .padding(20)
                 .foregroundColor(.white)
-                .background(Color.purple)
+                .background(Color.yellow)
                 .cornerRadius(10)
                 .bold()
                 .padding(50)
-                
         }
         .onAppear {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
@@ -77,7 +74,6 @@ struct SaleView: View {
 }
 
 #Preview {
-    
     @Previewable @State var dummyProduct = ProductReponse(
         id: UUID(),
         sku: 123456,
@@ -91,7 +87,6 @@ struct SaleView: View {
         saleDate: Date(),
         sold: false,
     )
-    
     SaleView(product: dummyProduct)
         .environment(ProductService())
 }
