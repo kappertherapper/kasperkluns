@@ -14,6 +14,7 @@ struct InfoView: View {
     @State private var totalProfitByQuarter = 0.0
     @State private var totalRevenue = 0.0
     @State private var totalProcent = 0.0
+    @State private var profitPerProduct = 0.0
     @State private var quarterVAT = 0.0
     
     @State private var totalProfitByMonthCount = 0
@@ -39,7 +40,7 @@ struct InfoView: View {
                         
                         Spacer().frame(height: 20)
                     }
-                    .padding()
+                    .padding(5)
                     .frame(maxWidth: .infinity)
                     .background(Color.blue.opacity(0.15))
                     .cornerRadius(12)
@@ -59,12 +60,28 @@ struct InfoView: View {
                             .bold()
                             .foregroundColor(.green)
                     }
-                    .padding()
+                    .padding(5)
                     .frame(maxWidth: .infinity)
                     .background(Color.green.opacity(0.15))
                     .cornerRadius(12)
                 }
                 .padding(.horizontal)
+                
+                // Profit Per Product
+                HStack {
+                    Text("Per-Product Profit:").bold()
+                    
+                    Text("\(profitPerProduct, specifier: "%.2f") kr")
+                        .bold()
+                        .foregroundColor(.green)
+                }
+                .padding(10)
+                .frame(maxWidth: .infinity)
+                .background(Color.yellow.opacity(0.15))
+                .cornerRadius(12)
+                .padding(.horizontal)
+                
+                
                 
                 // Profit by month
                 VStack(spacing: 15) {
@@ -97,7 +114,7 @@ struct InfoView: View {
                             .bold()
                             .foregroundColor(.blue)
                     }
-                    .padding()
+                    .padding(10)
                     .background(Color.gray.opacity(0.1))
                     .cornerRadius(10)
                     
@@ -117,15 +134,15 @@ struct InfoView: View {
                             Text("Calculate")
                                 .bold()
                         }
-                        .padding(15)
+                        .padding(10)
                         .background(Color.green)
                         .foregroundColor(.white)
                         .cornerRadius(12)
                         .shadow(radius: 3)
                     }
                 }
-                .padding()
-                .background(Color.yellow.opacity(0.15))
+                .padding(10)
+                .background(Color.orange.opacity(0.15))
                 .cornerRadius(12)
                 .padding(.horizontal)
                 
@@ -150,7 +167,7 @@ struct InfoView: View {
                             .bold()
                             .foregroundColor(.blue)
                     }
-                    .padding()
+                    .padding(10)
                     .background(Color.gray.opacity(0.1))
                     .cornerRadius(10)
                     
@@ -163,7 +180,7 @@ struct InfoView: View {
                             .bold()
                             .foregroundColor(.blue)
                     }
-                    .padding()
+                    .padding(10)
                     .background(Color.gray.opacity(0.1))
                     .cornerRadius(10)
                     
@@ -179,15 +196,15 @@ struct InfoView: View {
                             Text("Calculate")
                                 .bold()
                         }
-                        .padding(15)
+                        .padding(10)
                         .background(Color.green)
                         .foregroundColor(.white)
                         .cornerRadius(12)
                         .shadow(radius: 3)
                     }
                 }
-                .padding()
-                .background(Color.orange.opacity(0.15))
+                .padding(10)
+                .background(Color.red.opacity(0.15))
                 .cornerRadius(12)
                 .padding(.horizontal)
             }
@@ -198,6 +215,7 @@ struct InfoView: View {
                 try await productService.fetchProducts()
                 totalProfit = await productService.getTotalProfit()
                 totalRevenue = await productService.getTotalRevenue()
+                profitPerProduct = await productService.getProfitPerProduct()
                 totalProcent = totalProfit / totalRevenue * 100
             }
         }

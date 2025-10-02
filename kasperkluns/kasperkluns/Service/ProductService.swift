@@ -85,7 +85,7 @@ class ProductService {
                                             size: size,
                                             purchasePrice: purchasePrice,
                                             purchaseDate: purchaseDate,
-                                            sold: sold)
+                                            )
             
             var request = URLRequest(url: url)
             request.httpMethod = "POST"
@@ -234,6 +234,12 @@ class ProductService {
             }
         }
         return total
+    }
+    
+    func getProfitPerProduct() async -> Double {
+        let soldCount = Double(products.filter { $0.sold }.count)
+        guard soldCount > 0 else { return 0 }
+        return await getTotalProfit() / soldCount
     }
     
     func getTotalProfitAndCountByMonth(month: Int, year: Int) async -> (total: Double, count: Int) {
