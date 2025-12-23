@@ -22,3 +22,5 @@ kasperkluns is my personal inventory management application designed for small b
 Clone the repository:
 ```bash
 git clone https://github.com/kappertherapper/kasperkluns.git
+
+kasperkluns->Service->ProductService.swift (replace 'baseURL' with your ip-adress) 
