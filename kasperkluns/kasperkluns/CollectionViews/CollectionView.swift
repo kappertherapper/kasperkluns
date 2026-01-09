@@ -9,7 +9,7 @@ struct CollectionView: View {
     @State private var showAddView = false
     @State private var showConfirmation = false
     
-    @State private var sortOption: String = "All"
+    @State private var sortOption: String = ""
     @State private var searchText = ""
     
     let dummyProducts: [ProductReponse] = [
@@ -35,19 +35,20 @@ struct CollectionView: View {
         }
         
         let calendar = Calendar.current
-        let now = Date()
-        let startOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: now))!
-        let startOfNextMonth = calendar.date(byAdding: .month, value: 1, to: startOfMonth)!
-        let endOfMonth = calendar.date(byAdding: .second, value: -1, to: startOfNextMonth)!
-        //let endofNextMonth = calendar.date(byAdding: .month, value: 1, to: endOfMonth)!
+        let components = calendar.dateComponents([.year, .month], from: Date())
+        let startOfMonth = calendar.date(from: components)!
+        let endOfMonth = calendar.date(byAdding: .second, value: -1, to: calendar.date(byAdding: .month, value: 1, to: startOfMonth)!)!
         
         switch sortOption {
+        case "All Ascending": return products.sorted { $0.sku < $1.sku }
+        case "All Descending": return products.sorted { $0.sku > $1.sku }
         case "Sold": return products.filter { $0.sold }
         case "Not Sold": return products.filter { !$0.sold }
+            
         case "This Month": return products.filter {
-                guard let saleDate = $0.saleDate else { return false }
-                return saleDate >= startOfMonth && saleDate <= endOfMonth
-            }
+            guard let saleDate = $0.saleDate else { return false }
+            return saleDate >= startOfMonth && saleDate <= endOfMonth
+        }
         default:
             break
         }
@@ -59,14 +60,7 @@ struct CollectionView: View {
                 String(product.sku).contains(searchText)
             }
         }
-        
-        if sortOption == "Price Low-High" {
-            products = products.sorted { $0.purchasePrice < $1.purchasePrice }
-        } else if sortOption == "Price High-Low" {
-            products = products.sorted { $0.purchasePrice > $1.purchasePrice }
-        }
-        
-        return products.sorted { $0.sku < $1.sku }
+        return products.sorted { $0.sku > $1.sku }
     }
     
     var body: some View {
@@ -90,9 +84,9 @@ struct CollectionView: View {
                                         Text("\(spacedText(product.brand.rawValue)) \(product.name)")
                                             .font(.headline)
                                             .foregroundColor(.primary)
-                                            .padding(.vertical, 5)
+                                            .padding(.leading, 2)
                                     }
-
+                                    
                                     Spacer()
                                     
                                     if product.sold  {
@@ -144,14 +138,13 @@ struct CollectionView: View {
                                     .bold()
                             }
                             .foregroundColor(.white)
-                            .padding(.vertical, 12)
+                            .padding(.vertical, 6)
                             .frame(maxWidth: .infinity)
-                            .background(Color.purple)
+                            .background(Color.orange)
                             .cornerRadius(10)
                             .shadow(radius: 2)
                         }
                         .padding(.horizontal)
-                        .padding(.top)
                         
                         .alert("Sure you want to delete this product?",
                                isPresented: $showConfirmation,
@@ -172,7 +165,19 @@ struct CollectionView: View {
                     }
                     
                     Spacer()
+
                 }
+                Button(action: {
+                    //scrollPosition = filteredProducts.last
+                }) {
+                    Image(systemName: "chevron.down")
+                        .font(.system(size: 44))
+                        .foregroundColor(.blue.opacity(0.3))
+                        .padding(12)
+                }
+                .padding(.leading, 100)
+                .padding(.top, 350)
+                
             }
             .task {
                 do {
@@ -189,11 +194,10 @@ struct CollectionView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
-                        Button("All") { sortOption = "All" }
+                        Button("All Ascending") { sortOption = "All Ascending" }
+                        Button("All Descending") { sortOption = "All Descending" }
                         Button("Sold") { sortOption = "Sold" }
                         Button("Not Sold") { sortOption = "Not Sold" }
-                        Button("Price Low-High") { sortOption = "Price Low-High" }
-                        Button("Price High-Low") { sortOption = "Price High-Low" }
                     } label: {
                         Label("", systemImage: "chevron.down")
                     }
@@ -229,6 +233,7 @@ struct CollectionView: View {
         }
     }
 }
+
     
     #Preview {
         CollectionView()

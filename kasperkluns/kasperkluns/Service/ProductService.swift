@@ -8,7 +8,7 @@ class ProductService {
     var errorMessage: String?
     
 //    private let baseURL = "http://localhost:8080"
-    private let baseURL = "http://10.44.0.129:8080"
+    private let baseURL = "http://192.168.1.154:8080"
     
 // MARK: - READ
     func fetchProducts() async throws {
