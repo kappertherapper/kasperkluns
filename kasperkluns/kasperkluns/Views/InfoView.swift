@@ -16,6 +16,7 @@ struct InfoView: View {
     @State private var totalProcent = 0.0
     @State private var profitPerProduct = 0.0
     @State private var quarterVAT = 0.0
+    @State private var halfyearVAT = 0.0 //bror de har skiftet
     
     @State private var totalProfitByMonthCount = 0
     
