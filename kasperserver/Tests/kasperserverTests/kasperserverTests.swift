@@ -238,12 +238,12 @@ struct kasperserverTests {
 
     private static func makeProductRequest(sku: Int) -> ProductRequestContent {
         ProductRequestContent(
-            name: "Test Runner",
+            name: "Runner",
             sku: sku,
             description: "Created by and for test",
             brand: .NewBalance,
             size: .size45,
-            purchasePrice: 69.5,
+            purchasePrice: 420.69,
             purchaseDate: Date(timeIntervalSince1970: 1_735_689_600)
         )
     }
