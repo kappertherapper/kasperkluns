@@ -240,10 +240,10 @@ struct kasperserverTests {
         ProductRequestContent(
             name: "Test Runner",
             sku: sku,
-            description: "Created by the test suite",
-            brand: .Nike,
-            size: .size42,
-            purchasePrice: 79.5,
+            description: "Created by and for test",
+            brand: .NewBalance,
+            size: .size45,
+            purchasePrice: 69.5,
             purchaseDate: Date(timeIntervalSince1970: 1_735_689_600)
         )
     }
